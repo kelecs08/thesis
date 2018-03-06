@@ -29,7 +29,6 @@ public class MainWindow extends JFrame {
 
 	private CustomMenuBar customMenuBar;
 	private GamePanel tableBoardView;
-	private StarterPanel starterPanel;
 	
 	public MainWindow() {
 		loadMainWindowSettingProperties();
@@ -49,6 +48,7 @@ public class MainWindow extends JFrame {
 		this.tableBoardView = new GamePanel(mainController);
 		add(this.tableBoardView.createInitialTableBoard());
 		pack();
+		this.mainController.fillTableBoard();
 	}
 	
 	public void setMainController(MainController mainController) {
@@ -58,6 +58,7 @@ public class MainWindow extends JFrame {
 	private void setWindowButtonActions() {
 		setResizable(false);
 		
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -78,8 +79,9 @@ public class MainWindow extends JFrame {
 			System.out.println("IOException occured during the load of the icon image.");
 		}
 
-		int preferredSize = Integer.parseInt(properties.getProperty("preferredSize"));
-		setPreferredSize(new Dimension(preferredSize, preferredSize));
+		int preferredWindowSizeX = Integer.parseInt(properties.getProperty("preferredWindowSizeX"));
+		int preferredWindowSizeY = Integer.parseInt(properties.getProperty("preferredWindowSizeY"));
+		setPreferredSize(new Dimension(preferredWindowSizeX, preferredWindowSizeY));
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -110,7 +112,7 @@ public class MainWindow extends JFrame {
 	private void loadMainWindowSettingProperties() {
 		properties = new Properties();
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		try(InputStream inputStream = classLoader.getResourceAsStream("properties/main_window_setting.properties")) {
+		try(InputStream inputStream = classLoader.getResourceAsStream("properties/main_window_setting_small.properties")) {
 			properties.load(inputStream);
 		} catch (IOException e) {
 			System.out.println("IOException occured during the read of the property file.");
@@ -119,8 +121,11 @@ public class MainWindow extends JFrame {
 	
 	private void showExitConfirmation() {
 		int n = JOptionPane.showConfirmDialog(this, "Are you sure, you want to exit?", "Confirmation", JOptionPane.YES_NO_OPTION);
-		if(n == JOptionPane.YES_OPTION)
+		if(n == JOptionPane.YES_OPTION) {
 			doUponExit();
+		} else {
+			System.out.println("no exit");
+		}
 	}
 
 	private void doUponExit() { 

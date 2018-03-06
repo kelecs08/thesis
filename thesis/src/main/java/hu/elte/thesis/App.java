@@ -16,6 +16,7 @@ public class App {
     	
     	mainWindow.createCustomMenuBar();
     	mainWindow.createDefaultTableBoard();
+    	
 
     }
 }
