@@ -10,30 +10,44 @@ import hu.elte.thesis.view.dto.SimplePosition;
 
 public abstract class MainController {
 
+	private static final int ADDITIONAL_FIELDS = 4;
+	private static final int INITIAL_TABLE_SIZE = 4;
+
 	protected MainWindow mainWindow;
 	
-	protected int tableSize = 4;
-	protected int additionalTableSize = tableSize + 4;
+	protected int tableSize;
+	protected int additionalTableSize;
 	protected Position[][] tableBoardPositions;
 	
-	protected Player playerOne = new Player("Player 1", true);
-	protected Player playerTwo = new Player("Player 2", false);
+	protected Player playerOne;
+	protected Player playerTwo;
 	
-	protected Position clickedPosition = null;
-	protected Player actualPlayer = playerOne;
+	protected Position clickedPosition;
+	protected Player actualPlayer;
 	
-	protected List<Position> firstLevel = new ArrayList<>();
-	protected List<Position> secondLevel = new ArrayList<>();
+	protected List<Position> firstLevel;
+	protected List<Position> secondLevel;
 	
 	
 	public MainController() {
-		initializeTableBoardPositions(this.tableSize);
+		initializeTableBoard(INITIAL_TABLE_SIZE);
+		initializePlayers();
 	}
 
-	private void initializeTableBoardPositions(int tableSize) {
+	private void initializeTableBoard(int tableSize) {
 		this.tableSize = tableSize;
-		this.additionalTableSize = tableSize + 4;
+		this.additionalTableSize = tableSize + ADDITIONAL_FIELDS;
+		
 		this.tableBoardPositions = new Position[additionalTableSize][additionalTableSize];
+		
+		this.firstLevel = new ArrayList<>();
+		this.secondLevel = new ArrayList<>();
+	}
+
+	private void initializePlayers() {
+		this.playerOne = new Player("Player1", true);
+		this.playerTwo = new Player("Player2", false);
+		this.actualPlayer = this.playerOne;
 	}
 	
 	public void setMainWindow(MainWindow mainWindow) {
@@ -56,7 +70,7 @@ public abstract class MainController {
 		this.actualPlayer = actualPlayer;
 	}
 	
-	public void fillTableBoard() {
+	public void fillDefaultTableBoard() {
 		for(int i = 0; i < 2; i++) { //first two row, column
 			for(int j = 0; j < additionalTableSize; j++) {
 				this.tableBoardPositions[i][j] = new Position(i, j, null, false);
@@ -80,36 +94,31 @@ public abstract class MainController {
 		this.tableBoardPositions[2][additionalTableSize-3] = new Position(2, additionalTableSize-3, playerTwo, true);
 		this.tableBoardPositions[additionalTableSize-3][additionalTableSize-3] = new Position(additionalTableSize-3, additionalTableSize-3, playerTwo, true);
 		
+		this.mainWindow.createDefaultTableBoard();
 	}
 	
-	public boolean isPlayer1Field(int row, int column) {
-		Player player =  this.tableBoardPositions[row+2][column+2].getPlayer();
-		if(player == null) {
-			return false;
-		}
-		else {
-			return player.equals(playerOne);
-		}
+	public boolean isPlayerOneField(int row, int column) {
+		Player player = getPlayerAtGivenPosition(row, column);
+		if(player == null) return false;
+		else return player.equals(playerOne);
 	}
 	
-	public boolean isPlayer2Field(int row, int column) {
-		Player player =  this.tableBoardPositions[row+2][column+2].getPlayer();
-		if(player == null) {
-			return false;
-		}
-		else {
-			return player.equals(playerTwo);
-		}
+	public boolean isPlayerTwoField(int row, int column) {
+		Player player = getPlayerAtGivenPosition(row, column);
+		if(player == null) return false;
+		else return player.equals(playerTwo);
+	}
+
+	private Player getPlayerAtGivenPosition(int row, int column) {
+		return this.tableBoardPositions[row+2][column+2].getPlayer();
 	}
 
 	public boolean isClickOne(int row, int column) {
 		if(this.clickedPosition != null) return false; 				//someone already clicked before
 		Position position = this.tableBoardPositions[row][column]; 	//the clicked position
 		Player player = position.getPlayer(); 						//the player in the clicked position --> player1, player2, null !!
-		if(player != null && player.equals(actualPlayer)) {
+		if(player != null && player.equals(actualPlayer))
 			this.clickedPosition = position;
-			System.out.println("clicked position: " + clickedPosition.toString());
-		}
 		return this.clickedPosition != null;
 	}
 	
@@ -163,7 +172,6 @@ public abstract class MainController {
 		if(position != null) {
 			position.setPlayer(actualPlayer);
 			actualPlayer.modifyReservedSpotsNumber(1);
-			System.out.println("updated: " + position.toString());
 			overtakeFields(position);
 			updateDataFields();
 			return true;
@@ -172,7 +180,6 @@ public abstract class MainController {
 			if(position != null) {
 				position.setPlayer(actualPlayer);
 				clickedPosition.setPlayer(null);
-				System.out.println("updated: " + position.toString());
 				overtakeFields(position);
 				updateDataFields();
 				return true;
@@ -182,11 +189,11 @@ public abstract class MainController {
 	}
 	
 	private void overtakeFields(Position position) {
-		List<Position> firstLevelPositions = getFirstLevel(position);
+		List<Position> firstLevelPositions = getFirstLevel(position);		
 		int countOfOvertakenPositions = 0;
 		for(int i = 0; i < firstLevelPositions.size(); i++) {
 			Position possibleOvertake = firstLevelPositions.get(i);
-			if(possibleOvertake.getPlayer() != null) {
+			if(possibleOvertake.getPlayer() != null && possibleOvertake.getPlayer() != actualPlayer) {
 				firstLevelPositions.get(i).setPlayer(actualPlayer);
 				countOfOvertakenPositions++;
 			}
@@ -219,28 +226,17 @@ public abstract class MainController {
 	}
 
 	private void switchPlayer() {
-		if(this.actualPlayer.equals(playerOne)) {
+		if(this.actualPlayer.equals(playerOne))
 			this.actualPlayer = playerTwo;
-		} else {
+		else
 			this.actualPlayer = playerOne;
-		}
-		
 	}
 
 	public Position cleavage(int row, int column) {
 		for(int i = 0; i < firstLevel.size(); i++) {
 			Position position = firstLevel.get(i);
 			if(position.getRow() == row && position.getColumn() == column) {
-				Player player = position.getPlayer();
-				if(player != null) {
-					if(player.equals(actualPlayer)) {
-						return null;
-					} else {
-						return position;
-					}
-				} else {
-					return position;
-				}
+				return position;
 			}
 		}
 		return null;
@@ -250,16 +246,7 @@ public abstract class MainController {
 		for(int i = 0; i < secondLevel.size(); i++) {
 			Position position = secondLevel.get(i);
 			if(position.getRow() == row && position.getColumn() == column) {
-				Player player = position.getPlayer();
-				if(player != null) {
-					if(player.equals(actualPlayer)) {
-						return null;
-					} else {
-						return position;
-					}
-				} else {
-					return position;
-				}
+				return position;
 			}
 		}
 		return null;

@@ -15,7 +15,7 @@ public class App {
     	mainController.setMainWindow(mainWindow);
     	
     	mainWindow.createCustomMenuBar();
-    	mainWindow.createDefaultTableBoard();
+    	mainController.fillDefaultTableBoard();
     	
 
     }

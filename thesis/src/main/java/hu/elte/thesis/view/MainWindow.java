@@ -48,7 +48,6 @@ public class MainWindow extends JFrame {
 		this.tableBoardView = new GamePanel(mainController);
 		add(this.tableBoardView.createInitialTableBoard());
 		pack();
-		this.mainController.fillTableBoard();
 	}
 	
 	public void setMainController(MainController mainController) {

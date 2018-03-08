@@ -94,43 +94,36 @@ public class GamePanel extends JPanel {
 	private void addButton(JPanel center, int i, int j) {
 		JButton button = new JButton();
 		setInitialButtonAppearance(button, i, j);
+		
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(mainController.isClickOne(i, j)) {
-					System.out.println("in first click");
 					renderFirstLevelFields();
 					renderSecondLevelFields();
 				}
-				else if(mainController.isClickingTheClickedPosition(i, j)) {
+				else if(mainController.isClickingTheClickedPosition(i, j))
 					updateFields();
-				} else if(!mainController.isClickOne(i, j)) {
-						if(mainController.step(i, j)) {
-							updateFields();
-						}
-				}				
+				else if(!mainController.isClickOne(i, j))
+					if(mainController.step(i, j))
+						updateFields();				
 			}
-
 		});
 		center.add(button);
 	}
 
 	private void renderFirstLevelFields() {
-		List<SimplePosition> positionsToBeRenderedFirstLevel = mainController.getPositionsToBeRenderedFirstLevel();
-		for(SimplePosition sp: positionsToBeRenderedFirstLevel) {
-			Component component = center.getComponent(sp.getRow() * mainController.getTableSize() + sp.getColumn());
-			JButton field = (JButton) component;
-			field.setBackground(Color.DARK_GRAY);
-			System.out.println("\n first level " + sp.toString());
-		}
+		renderFields(mainController.getPositionsToBeRenderedFirstLevel(), Color.DARK_GRAY);
 	}
 
 	private void renderSecondLevelFields() {
-		List<SimplePosition> positionsToBeRenderedSecondLevel = mainController.getPositionsToBeRenderedSecondLevel();
-		for(SimplePosition sp: positionsToBeRenderedSecondLevel) {
+		renderFields(mainController.getPositionsToBeRenderedSecondLevel(), Color.GRAY);
+	}
+
+	private void renderFields(List<SimplePosition> positionsToBeRendered, Color color) {
+		for(SimplePosition sp: positionsToBeRendered) {
 			Component component = center.getComponent(sp.getRow() * mainController.getTableSize() + sp.getColumn());
 			JButton field = (JButton) component;
-			field.setBackground(Color.GRAY);
-			System.out.println("\n second level " + sp.toString());
+			field.setBackground(color);
 		}
 	}
 	
@@ -148,13 +141,9 @@ public class GamePanel extends JPanel {
 			for(int j = 0; j < this.mainController.getTableSize(); j++) {
 				Component component = center.getComponent(i * this.mainController.getTableSize() + j);
 				JButton field = (JButton) component;
-				if(this.mainController.isPlayer1Field(i, j)) {
-					field.setIcon(playerOneImage);
-				} else if(this.mainController.isPlayer2Field(i, j)) {
-					field.setIcon(playerTwoImage);
-				} else {
-					field.setIcon(null);
-				}
+				if(this.mainController.isPlayerOneField(i, j)) field.setIcon(playerOneImage);
+				else if(this.mainController.isPlayerTwoField(i, j)) field.setIcon(playerTwoImage);
+				else field.setIcon(null);
 				field.setBackground(Color.LIGHT_GRAY);
 			}
 		}
