@@ -31,7 +31,6 @@ public class GamePanel extends JPanel {
 	private static final long serialVersionUID = -3559703782267201891L;
 
 	private MainController mainController;
-	private GameType gameType = GameType.TWO_PLAYER;
 	private ImageResizingService imageResizingService;
 	
 	private ImageIcon playerOneImage;
@@ -98,14 +97,19 @@ public class GamePanel extends JPanel {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(mainController.isClickOne(i, j)) {
+					System.out.println("In isClickOne function");
 					renderFirstLevelFields();
 					renderSecondLevelFields();
 				}
 				else if(mainController.isClickingTheClickedPosition(i, j))
 					updateFields();
 				else if(!mainController.isClickOne(i, j))
-					if(mainController.step(i, j))
-						updateFields();				
+					if(mainController.step(i, j)) {
+						updateFields();
+						mainController.stepWithComputer();
+						updateFields();						
+						System.out.println("In step function");
+					}
 			}
 		});
 		center.add(button);
@@ -131,11 +135,11 @@ public class GamePanel extends JPanel {
 		button.setPreferredSize(new Dimension(70, 70));
 		button.setBackground(Color.LIGHT_GRAY);
 		button.setFont(new Font("Times New Roman", Font.BOLD, 30));
-		if( (i == 2 && j == 2) || (i == this.mainController.getTableSize() + 1 && j == 2) ) button.setIcon(playerOneImage);;
+		if( (i == 2 && j == 2) || (i == this.mainController.getTableSize() + 1 && j == 2) ) button.setIcon(playerOneImage);
 		if( (i == 2 && j == this.mainController.getTableSize() + 1) || (i == this.mainController.getTableSize() + 1 && j == this.mainController.getTableSize() + 1) ) button.setIcon(playerTwoImage);
 	}
 	
-	private void updateFields() {
+	public void updateFields() {
 		this.actualPlayerLabel.setText("Actual player: " + this.mainController.getActualPlayer().getName());
 		for(int i = 0; i < this.mainController.getTableSize(); i++) {
 			for(int j = 0; j < this.mainController.getTableSize(); j++) {
@@ -147,20 +151,19 @@ public class GamePanel extends JPanel {
 				field.setBackground(Color.LIGHT_GRAY);
 			}
 		}
+		checkWinning();
 	}
 
-	private void getWinner(Player winner) {
-		JOptionPane.showMessageDialog(this, "Game over!\nThe winner is player " + winner.getName() + " !! :D");
-		//newGame();
-	}
-
-/*	private void newGame() {
-		GameWindow newWindow = new GameWindow(this.gameType, this.tableSize);
-		newWindow.setVisible(true);
-		disposeWindow();
-	}*/
-	
-	
-	
+	private void checkWinning() {
+		if(this.mainController.isDraw()) {
+			JOptionPane.showMessageDialog(this, "Game over!\nThe game ended in a draw.");
+			this.mainController.startNewGame();
+		}
+		Player winner = this.mainController.getWinner();
+		if(winner != null) {
+			JOptionPane.showMessageDialog(this, "Game over!\nThe winner is player " + winner.getName() + " !! :D");
+			this.mainController.startNewGame();
+		}
+	}	
 	
 }

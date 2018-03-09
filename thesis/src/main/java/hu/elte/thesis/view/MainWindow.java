@@ -28,7 +28,7 @@ public class MainWindow extends JFrame {
 	private MainController mainController;
 
 	private CustomMenuBar customMenuBar;
-	private GamePanel tableBoardView;
+	private GamePanel gamePanel;
 	
 	public MainWindow() {
 		loadMainWindowSettingProperties();
@@ -45,8 +45,8 @@ public class MainWindow extends JFrame {
 	}
 
 	public void createDefaultTableBoard() {
-		this.tableBoardView = new GamePanel(mainController);
-		add(this.tableBoardView.createInitialTableBoard());
+		this.gamePanel = new GamePanel(mainController);
+		add(this.gamePanel.createInitialTableBoard());
 		pack();
 	}
 	
@@ -118,7 +118,7 @@ public class MainWindow extends JFrame {
 		}
 	}
 	
-	private void showExitConfirmation() {
+	public void showExitConfirmation() {
 		int n = JOptionPane.showConfirmDialog(this, "Are you sure, you want to exit?", "Confirmation", JOptionPane.YES_NO_OPTION);
 		if(n == JOptionPane.YES_OPTION) {
 			doUponExit();
@@ -130,4 +130,9 @@ public class MainWindow extends JFrame {
 	private void doUponExit() { 
 		this.dispose();
 	}
+
+	public GamePanel getGamePanel() {
+		return gamePanel;
+	}	
+	
 }
