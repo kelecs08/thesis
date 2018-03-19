@@ -11,7 +11,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import hu.elte.thesis.controller.MainController;
-import hu.elte.thesis.view.menu.FileMenu;
+import hu.elte.thesis.view.menu.GameMenu;
+import hu.elte.thesis.view.menu.HelpMenu;
+import hu.elte.thesis.view.menu.SettingsMenu;
 import hu.elte.thesis.view.service.ImageResizingService;
 
 public class CustomMenuBar extends JMenuBar {
@@ -26,8 +28,14 @@ public class CustomMenuBar extends JMenuBar {
 	}
 	
 	public CustomMenuBar getCustomMenuBar() {		
-		FileMenu fileMenu = new FileMenu(mainController);
+		GameMenu fileMenu = new GameMenu(mainController);
 		add(fileMenu.getFileMenu());
+		
+		SettingsMenu settingsMenu = new SettingsMenu(mainController);
+		add(settingsMenu.getSettingsMenu());
+		
+		HelpMenu helpMenu = new HelpMenu(mainController);
+		add(helpMenu.getHelpMenu());
 		
 		return this;
 	}

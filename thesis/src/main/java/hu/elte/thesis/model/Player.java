@@ -17,6 +17,7 @@ public class Player {
 	public void setName(String name) { this.name = name; }
 	
 	public int getReservedSpots() {	return reservedSpots; }
+	public void setReservedSpots(int reservedSpots) { this.reservedSpots = reservedSpots; }
 	public void modifyReservedSpotsNumber(int number) {	this.reservedSpots += number; }
 	
 	public boolean isComputerPlayer( ) { return this.computerPlayer; }

@@ -29,6 +29,19 @@ public class Node {
 
 	public List<Node> getChildrenNodes() { return childrenNodes; }
 	public void addChildNode(Node childNode) { this.childrenNodes.add(childNode); }
+	
+	public Node getBestChild() {
+		Node bestChild = null;
+		if(childrenNodes.size() > 0) {
+			bestChild = childrenNodes.get(0);
+			for(int i = 0; i < childrenNodes.size(); i++) {
+				if(bestChild.getScore() < childrenNodes.get(i).getScore()) {
+					bestChild = childrenNodes.get(i);
+				}
+			}
+		}
+		return bestChild;
+	}
 
 	@Override
 	public String toString() {

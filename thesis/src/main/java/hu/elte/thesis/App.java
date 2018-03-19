@@ -1,7 +1,6 @@
 package hu.elte.thesis;
 
 import hu.elte.thesis.controller.MainController;
-import hu.elte.thesis.controller.TwoPlayerController;
 import hu.elte.thesis.view.MainWindow;
 
 public class App {
@@ -13,12 +12,11 @@ public class App {
     	
     	mainWindow.setMainController(mainController);
     	mainController.setMainWindow(mainWindow);
-    	
+
     	mainWindow.createCustomMenuBar();
     	
     	mainWindow.createDefaultTableBoard();
     	mainController.fillDefaultTableBoard();
-    	
 
     }
 }
