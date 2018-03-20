@@ -2,10 +2,15 @@ package hu.elte.thesis.view.menu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 import hu.elte.thesis.controller.MainController;
 import hu.elte.thesis.model.GameType;
@@ -79,7 +84,22 @@ public class GameMenu extends JMenu {
 		saveGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+			//	mainController.
+				String test = "test";
+				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+
+				fileChooser.setAcceptAllFileFilterUsed(false);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Custom file format (*.an)", "an");
+				fileChooser.addChoosableFileFilter(filter);
+								
+				int returnValue = fileChooser.showSaveDialog(mainController.getMainWindow());
+				if(returnValue == JFileChooser.APPROVE_OPTION) {
+					try(FileWriter fileWriter = new FileWriter(fileChooser.getSelectedFile()+".an")) {
+						fileWriter.write(test);
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
+				}
 			}
 		});
 		add(saveGame);
@@ -91,7 +111,17 @@ public class GameMenu extends JMenu {
 		loadGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 				
+				fileChooser.setAcceptAllFileFilterUsed(false);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Custom file format (*.an)", "an");
+				fileChooser.addChoosableFileFilter(filter);
+				
+				int returnValue = fileChooser.showOpenDialog(mainController.getMainWindow());
+				if(returnValue == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = fileChooser.getSelectedFile();
+					System.out.println(selectedFile.getPath());
+				}
 			}
 		});
 		add(loadGame);

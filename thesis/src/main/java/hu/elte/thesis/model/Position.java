@@ -1,6 +1,10 @@
 package hu.elte.thesis.model;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
+
+	private static final long serialVersionUID = -4126487606928388791L;
 
 	private int row;
 	private int column;
