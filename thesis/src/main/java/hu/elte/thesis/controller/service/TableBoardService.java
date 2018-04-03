@@ -65,6 +65,7 @@ public class TableBoardService {
 		return secondLevelPositions;
 	}
 	
+<<<<<<< HEAD
 	public boolean checkStepsAvailableForAllPlayerField(List<Position> positions, Position[][] tableBoardPositions) {
 		for(Position p : positions) {
 			if(checkStepsAvailable(p, tableBoardPositions)) {
@@ -75,6 +76,9 @@ public class TableBoardService {
 	}
 	
 	public boolean checkStepsAvailable(Position position, Position[][] tableBoardPositions) {
+=======
+	public boolean checkStepAvailable(Position position, Position[][] tableBoardPositions) {
+>>>>>>> 48c095c71baa08e7ef6a2625f8519043723b057a
 		List<Position> firstLevel = getFirstLevel(position, tableBoardPositions);
 		List<Position> secondLevel = getSecondLevel(position, tableBoardPositions);
 		for(Position p1: firstLevel)
@@ -83,6 +87,7 @@ public class TableBoardService {
 			if(p2.isValidSpace() && p2.getPlayer() == null)	return true;
 		return false;
 	}
+<<<<<<< HEAD
 	
 	public void tableBoardPositionsToString(Position[][] tableBoardPositions, MainController mainController) {
 		for(int i = 0; i < mainController.getTableSize()+4; i++) {
@@ -91,4 +96,6 @@ public class TableBoardService {
 			}
 		}
 	}
+=======
+>>>>>>> 48c095c71baa08e7ef6a2625f8519043723b057a
 }

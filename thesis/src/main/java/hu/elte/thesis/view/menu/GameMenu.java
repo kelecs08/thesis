@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -15,7 +14,6 @@ import javax.swing.filechooser.FileSystemView;
 
 import hu.elte.thesis.controller.MainController;
 import hu.elte.thesis.model.GameType;
-import hu.elte.thesis.view.service.FileMenuService;
 import hu.elte.thesis.view.service.ImageResizingService;
 
 public class GameMenu extends JMenu {
@@ -24,13 +22,11 @@ public class GameMenu extends JMenu {
 	
 	private MainController mainController;
 	private ImageResizingService imageResizingService;
-	private FileMenuService fileMenuService;
 		
 	public GameMenu(MainController mainController) {
 		super("Game");
 		this.mainController = mainController;
 		this.imageResizingService = new ImageResizingService();
-		this.fileMenuService = new FileMenuService(mainController);
 	}
 	
 	public GameMenu getFileMenu() {
@@ -70,12 +66,26 @@ public class GameMenu extends JMenu {
 		add(newGame);
 	}
 
+	private void addExitMenuItem() {
+		ImageIcon exitIcon = imageResizingService.resizeImage("images/icons/exit_icon.jpg", false);
+		JMenuItem exitGame = new JMenuItem("Exit", exitIcon);
+		exitGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainController.getMainWindow().showExitConfirmation();
+			}
+		});
+		add(exitGame);		
+	}
+
 	private void addSaveGameMenuItem() {
 		ImageIcon saveIcon = imageResizingService.resizeImage("images/icons/save_icon.jpg", false);
 		JMenuItem saveGame = new JMenuItem("Save", saveIcon);
 		saveGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+			//	mainController.
+				String test = "test";
 				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
 				fileChooser.setAcceptAllFileFilterUsed(false);
@@ -84,9 +94,9 @@ public class GameMenu extends JMenu {
 								
 				int returnValue = fileChooser.showSaveDialog(mainController.getMainWindow());
 				if(returnValue == JFileChooser.APPROVE_OPTION) {
-					try {
-						fileMenuService.writeToFile(fileChooser.getSelectedFile() + ".an", mainController.getActualPlayer(), mainController.getPlayerOne(), mainController.getPlayerTwo(), mainController.getTableBoardPositions());
-					} catch(IOException ex) {
+					try(FileWriter fileWriter = new FileWriter(fileChooser.getSelectedFile()+".an")) {
+						fileWriter.write(test);
+					} catch(Exception ex) {
 						ex.printStackTrace();
 					}
 				}
@@ -109,28 +119,12 @@ public class GameMenu extends JMenu {
 				
 				int returnValue = fileChooser.showOpenDialog(mainController.getMainWindow());
 				if(returnValue == JFileChooser.APPROVE_OPTION) {
-					try {
-						fileMenuService.loadFromFile(fileChooser.getSelectedFile());
-						mainController.getMainWindow().getGamePanel().updateFields();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}					
+					File selectedFile = fileChooser.getSelectedFile();
+					System.out.println(selectedFile.getPath());
 				}
 			}
 		});
 		add(loadGame);
-	}
-
-	private void addExitMenuItem() {
-		ImageIcon exitIcon = imageResizingService.resizeImage("images/icons/exit_icon.jpg", false);
-		JMenuItem exitGame = new JMenuItem("Exit", exitIcon);
-		exitGame.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mainController.getMainWindow().showExitConfirmation();
-			}
-		});
-		add(exitGame);		
 	}
 
 }

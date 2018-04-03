@@ -29,8 +29,7 @@ public class Tree {
 
 	@Override
 	public String toString() {
-		return "Tree [root=" + root + ", bestChildren=" + bestChildren + ", bestScore=" + bestScore + ", level=" + level
-				+ "]\n";
+		return "Tree [root=" + root + ", bestChildren=" + bestChildren + ", bestScore=" + bestScore + ", level=" + level + "]";
 	}
 	
 	

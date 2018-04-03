@@ -25,7 +25,8 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = -9104376452678470583L;
 
 	private final PropertyService propertyService;
-
+	
+	private PropertyService propertyService;
 	private MainController mainController;
 
 	private CustomMenuBar customMenuBar;
@@ -34,7 +35,7 @@ public class MainWindow extends JFrame {
 	public MainWindow() {
 		this.propertyService = new PropertyService();
 		loadNimbusLookAndFeel();
-
+		
 		setInitialStyle();
 		setWindowButtonActions();
 	}
@@ -58,7 +59,11 @@ public class MainWindow extends JFrame {
 	public GamePanel getGamePanel() {
 		return gamePanel;
 	}
+	
+	public void setMainController(MainController mainController) { this.mainController = mainController; }
 
+	public GamePanel getGamePanel() { return gamePanel; }	
+	
 	private void setWindowButtonActions() {
 		setResizable(false);
 
@@ -78,12 +83,13 @@ public class MainWindow extends JFrame {
 		ClassLoader classLoader = Thread.currentThread()
 			.getContextClassLoader();
 		try (InputStream inputStream = classLoader.getResourceAsStream(mainWindowSettingProperties.getProperty("image"))) {
+		
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		try(InputStream inputStream = classLoader.getResourceAsStream(mainWindowSettingProperties.getProperty("image"))) {
 			BufferedImage image;
 			image = ImageIO.read(inputStream);
 			setIconImage(image);
-		} catch (IOException e) {
-			System.out.println("IOException occured during the load of the icon image.");
-		}
+		} catch (IOException e) { System.out.println("IOException occured during the load of the icon image.");	}
 
 		int preferredWindowSizeX = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeX"));
 		int preferredWindowSizeY = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeY"));
@@ -92,6 +98,22 @@ public class MainWindow extends JFrame {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
+	
+	public void setFrameSettings(String size) {
+		Properties mainWindowSettingProperties = propertyService.loadMainWindowSettingProperties(size);
+		int preferredWindowSizeX = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeX"));
+		int preferredWindowSizeY = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeY"));
+		setPreferredSize(new Dimension(preferredWindowSizeX, preferredWindowSizeY));
+		pack();
+		setLocationRelativeTo(null);
+	}
+	
+	public void showExitConfirmation() {
+		int n = JOptionPane.showConfirmDialog(this, "Are you sure, you want to exit?", "Confirmation", JOptionPane.YES_NO_OPTION);
+		if(n == JOptionPane.YES_OPTION)	doUponExit();
+	}
+
+	private void doUponExit() { this.dispose(); }
 
 	public void setFrameSettings(String size) {
 		Properties mainWindowSettingProperties = propertyService.loadMainWindowSettingProperties(size);
@@ -134,5 +156,25 @@ public class MainWindow extends JFrame {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void loadNimbusLookAndFeel() {
+		try {
+			for(LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
+				if("Nimbus".equals(lookAndFeelInfo.getName())) {
+					UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
+					break;
+				}
+			}
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e1) {	System.out.println("Nimbus look and feel failed to be loaded."); }
+	}
+	
+	public void loadMetalLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) { e.printStackTrace(); }
 	}
 }

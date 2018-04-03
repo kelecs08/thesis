@@ -1,5 +1,6 @@
 package hu.elte.thesis.view.menu;
 
+<<<<<<< HEAD
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -18,12 +19,16 @@ import javax.swing.JTextArea;
 import hu.elte.thesis.controller.MainController;
 import hu.elte.thesis.view.service.ImageResizingService;
 import hu.elte.thesis.view.service.PropertyService;
+import javax.swing.JMenu;
+
+import hu.elte.thesis.controller.MainController;
 
 public class HelpMenu extends JMenu {
 
 	private static final long serialVersionUID = 6667707369562342166L;
 
 	private MainController mainController;
+
 	private ImageResizingService imageResizingService;
 	private PropertyService propertyService;
 	private Properties properties;
@@ -97,5 +102,16 @@ public class HelpMenu extends JMenu {
 		textArea.setFont(new Font("Times new roman", Font.PLAIN, 15));
 		return textArea;
 	}
-
+	
+	public HelpMenu(MainController mainController) {
+		super("Help");
+		this.mainController = mainController;
+	}
+	
+	public HelpMenu getHelpMenu() {
+		
+		
+		
+		return this;
+	}
 }
