@@ -1,6 +1,5 @@
 package hu.elte.thesis.view.menu;
 
-<<<<<<< HEAD
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -101,17 +100,5 @@ public class HelpMenu extends JMenu {
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times new roman", Font.PLAIN, 15));
 		return textArea;
-	}
-	
-	public HelpMenu(MainController mainController) {
-		super("Help");
-		this.mainController = mainController;
-	}
-	
-	public HelpMenu getHelpMenu() {
-		
-		
-		
-		return this;
 	}
 }

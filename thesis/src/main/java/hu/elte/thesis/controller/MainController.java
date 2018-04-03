@@ -91,31 +91,7 @@ public class MainController {
 		this.playerService.updatePlayers(playerOne, playerTwo, playerTwo.isComputerPlayer());
 		fillDefaultTableBoard();
 	}
-
-	public void fillDefaultTableBoard() {
-		tableBoardService.fillDefaultTableBoard(tableSize, tableBoardPositions, playerOne, playerTwo);
 		
-		if(isComputerPlayer) this.playerTwo = new Player("Player2", true);
-		else this.playerTwo = new Player("Player2", false);
-		
-		this.actualPlayer = this.playerOne;
-	}
-
-	public void startNewGame(boolean isComputerPlayer) {
-		initializeTableBoard(this.tableSize);
-		initializePlayers(isComputerPlayer);
-		fillDefaultTableBoard();
-		this.mainWindow.getGamePanel().updateFields();
-	}
-	
-	public void changeTableSize(int tableSize) {
-		initializeTableBoard(tableSize);
-		this.playerOne.setReservedSpots(2);
-		this.playerTwo.setReservedSpots(2);
-		this.actualPlayer = playerOne;
-		fillDefaultTableBoard();
-	}
-	
 	public void fillDefaultTableBoard() {
 		tableBoardService.fillDefaultTableBoard(tableSize, tableBoardPositions, playerOne, playerTwo);	
 	}
@@ -274,21 +250,6 @@ public class MainController {
 		}
 	}
 
-	public Player getOtherPlayer(Player player) {
-		if (player.equals(playerOne)) {
-			return playerTwo;
-		}
-		return playerOne;
-	}
-
-	public Player getWinner() {
-		return playerService.getWinner(tableSize * tableSize, playerOne, playerTwo);
-	}
-
-	public boolean isDraw() {
-		return playerService.isDraw(tableSize * tableSize, playerOne, playerTwo);
-	}
-
 	public boolean isDrawWhenStepsAreNotAvailable() {
 		return playerService.isDrawWhenStepsAreNotAvailable(playerOne, playerTwo);
 	}
@@ -344,9 +305,10 @@ public class MainController {
 				updateDataFields();
 				mainWindow.getGamePanel()
 					.renderField(rootPosition.getRow() - 2, rootPosition.getColumn() - 2, Color.YELLOW);
-
-		if(this.actualPlayer.equals(playerOne))	this.actualPlayer = playerTwo;
-		else this.actualPlayer = playerOne;
+				return positionToStep;
+			}
+		}
+			return null;
 	}
 	
 	public Player getOtherPlayer(Player player) {
@@ -357,7 +319,7 @@ public class MainController {
 	public Player getWinner() {	return playerService.getWinner(tableSize*tableSize, playerOne, playerTwo); }
 	public boolean isDraw() { return playerService.isDraw(tableSize*tableSize, playerOne, playerTwo); }
 
-	public Position stepWithComputer() { //TODO: array to be passed as rootPosition
+/*	public Position stepWithComputer() { //TODO: array to be passed as rootPosition
 		if(playerTwo.isComputerPlayer()) {
 			List<Position> rootPositions = new ArrayList<>();
 			for(int i = 2; i < tableSize+2; i++) {
@@ -385,64 +347,7 @@ public class MainController {
 			}
 		}
 		return null;
-	}
-
-	public MainWindow getMainWindow() {
-		return this.mainWindow;
-	}
-
-	public void setMainWindow(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-	}
-
-	public GameType getGameType() {
-		return this.gameType;
-	}
-
-	public void setGameType(GameType gameType) {
-		this.gameType = gameType;
-	}
-
-	public Position[][] getTableBoardPositions() {
-		return this.tableBoardPositions;
-	}
-
-	public void setTableBoardPositions(Position[][] tableBoardPositions) {
-		this.tableBoardPositions = tableBoardPositions;
-	}
-
-	public int getTableSize() {
-		return this.tableSize;
-	}
-
-	public void setTableSize(int tableSize) {
-		this.tableSize = tableSize;
-	}
-
-	public Player getActualPlayer() {
-		return this.actualPlayer;
-	}
-
-	public void setActualPlayer(Player actualPlayer) {
-		this.actualPlayer = actualPlayer;
-	}
-
-	public Player getPlayerOne() {
-		return playerOne;
-	}
-
-	public void setPlayerOne(Player playerOne) {
-		this.playerOne = playerOne;
-	}
-
-	public Player getPlayerTwo() {
-		return playerTwo;
-	}
-
-	public void setPlayerTwo(Player playerTwo) {
-		this.playerTwo = playerTwo;
-	}
-
+	}*/
 	
 	public MainWindow getMainWindow() {	return this.mainWindow; }
 	public void setMainWindow(MainWindow mainWindow) { this.mainWindow = mainWindow; }
@@ -451,6 +356,7 @@ public class MainController {
 	public void setGameType(GameType gameType) { this.gameType = gameType; }
 	
 	public Position[][] getTableBoardPositions() { return this.tableBoardPositions; }
+	public void setTableBoardPositions(Position[][] tableBoardPositions2) { this.tableBoardPositions = tableBoardPositions; }
 	
 	public int getTableSize() {	return this.tableSize; }
 	public void setTableSize(int tableSize) { this.tableSize = tableSize; }
@@ -459,6 +365,10 @@ public class MainController {
 	public void setActualPlayer(Player actualPlayer) { this.actualPlayer = actualPlayer; }
 	
 	public Player getPlayerOne() { return playerOne; }
+	public void setPlayerOne(Player playerOne) { this.playerOne = playerOne; }
+	
 	public Player getPlayerTwo() { return playerTwo; }
+	public void setPlayerTwo(Player playerTwo) { this.playerTwo = playerTwo; }
+	
 
 }

@@ -97,6 +97,7 @@ public class MinimaxAlgorithm {
 			}
 		}
 		return new RootChild(bestTree.getRoot().getPosition(), bestTree.getBestChildren().get(0).getPosition(), bestTree.getBestScore());
+	}
 
 	private int evaluationFunction(Position position, int initial) { //how many fields are overtaken if we step to this position?
 		int countOfPossibleOvertakes = initial;

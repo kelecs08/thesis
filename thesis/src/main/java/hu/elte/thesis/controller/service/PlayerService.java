@@ -14,7 +14,6 @@ public class PlayerService {
 		return null;
 	}
 	
-<<<<<<< HEAD
 	public boolean isDrawWhenStepsAreNotAvailable(Player playerOne, Player playerTwo) {
 		return playerOne.getReservedSpots() == playerTwo.getReservedSpots();
 	}

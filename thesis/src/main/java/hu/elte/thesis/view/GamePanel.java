@@ -32,27 +32,6 @@ public class GamePanel extends JPanel {
 
 	private static final long serialVersionUID = -3559703782267201891L;
 
-	private final MainController mainController;
-	private final ImageResizingService imageResizingService;
-	private final PropertyService propertyService;
-	private final Properties iconProperties;
-
-	private ImageIcon playerOneImage;
-	private ImageIcon playerTwoImage;
-
-	private JPanel center;
-	private JPanel playerOnePanel;
-	private JPanel playerTwoPanel;
-
-	private JLabel playerOneIconLabel;
-	private JLabel playerTwoIconLabel;
-
-	private JButton playerOneNameButton;
-	private JButton playerTwoNameButton;
-
-	private JButton playerOneScoreButton;
-	private JButton playerTwoScoreButton;
-
 	private boolean won = false;
 
 	private MainController mainController;
@@ -87,42 +66,6 @@ public class GamePanel extends JPanel {
 		this.playerOneImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.BLUE.getBlobColorString()), playerSize, playerSize, false);
 		this.playerTwoImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.RED.getBlobColorString()), playerSize, playerSize, true);
 	}
-
-	public ImageIcon getPlayerOneImage() {
-		return playerOneImage;
-	}
-
-	public void setPlayerOneImage(ImageIcon playerOneImage) {
-		this.playerOneImage = playerOneImage;
-	}
-
-	public ImageIcon getPlayerTwoImage() {
-		return playerTwoImage;
-	}
-
-	public void setPlayerTwoImage(ImageIcon playerTwoImage) {
-		this.playerTwoImage = playerTwoImage;
-	}
-
-	public JLabel getPlayerOneIconLabel() {
-		return playerOneIconLabel;
-	}
-
-	public void setPlayerOneIconLabel(JLabel playerOneIconLabel) {
-		this.playerOneIconLabel = playerOneIconLabel;
-	}
-
-	public JLabel getPlayerTwoIconLabel() {
-		return playerTwoIconLabel;
-	}
-
-	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) {
-		this.playerTwoIconLabel = playerTwoIconLabel;
-		
-		int playerSize = Integer.parseInt(iconProperties.getProperty("playerSize"));
-		this.playerOneImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.BLUE.getBlobColorString()), playerSize, playerSize, false);
-		this.playerTwoImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.RED.getBlobColorString()), playerSize, playerSize, true);
-	}
 	
 	public ImageIcon getPlayerOneImage() { return playerOneImage; }
 	public void setPlayerOneImage(ImageIcon playerOneImage) { this.playerOneImage = playerOneImage;	}
@@ -135,7 +78,6 @@ public class GamePanel extends JPanel {
 
 	public JLabel getPlayerTwoIconLabel() {	return playerTwoIconLabel; }
 	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) { this.playerTwoIconLabel = playerTwoIconLabel;}
-
 
 	public JPanel createInitialTableBoard() {
 		center = new JPanel();
@@ -151,8 +93,7 @@ public class GamePanel extends JPanel {
 		playerOneIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("blue"), playerLabelSize, playerLabelSize, false));
 		playerIconLabelSettings(playerOneIconLabel);
 
-		playerOneNameButton = new JButton(mainController.getPlayerOne()
-			.getName());
+		playerOneNameButton = new JButton(mainController.getPlayerOne().getName());
 		playerOneNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -160,36 +101,12 @@ public class GamePanel extends JPanel {
 					.getName(), JOptionPane.QUESTION_MESSAGE);
 				if (name != null && !("").equals(name) && name.length() <= 10) {
 					playerOneNameButton.setText(name);
-					mainController.getPlayerOne()
-						.setName(name);
-	    center.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		
-	    
-		playerOnePanel = new JPanel();
-		BoxLayout boxLayout = new BoxLayout(playerOnePanel, BoxLayout.Y_AXIS);
-		playerOnePanel.setLayout(boxLayout);
-		
-		int playerLabelSize = Integer.parseInt(iconProperties.getProperty("playerLabelSize"));
-		playerOneIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("blue"), playerLabelSize, playerLabelSize, false));
-		playerIconLabelSettings(playerOneIconLabel);
-		
-		playerOneNameButton = new JButton(mainController.getPlayerOne().getName());
-		playerOneNameButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerOne().getName(), JOptionPane.QUESTION_MESSAGE);
-				if(name != null && !("").equals(name) && name.length() <= 10) {
-					playerOneNameButton.setText(name);
 					mainController.getPlayerOne().setName(name);
 				}
 			}
 		});
-		playerButtonSettings(playerOneNameButton);
-		setBGBlackFGWhite(playerOneNameButton);
-
-		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne()
-			.getReservedSpots()));
-		
+	 	playerButtonSettings(playerOneNameButton);
+		setBGBlackFGWhite(playerOneNameButton);		
 		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
 		playerButtonSettings(playerOneScoreButton);
 		setBGBlackFGWhite(playerOneScoreButton);
@@ -206,8 +123,7 @@ public class GamePanel extends JPanel {
 		playerTwoIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("red"), playerLabelSize, playerLabelSize, true));
 		playerIconLabelSettings(playerTwoIconLabel);
 
-		playerTwoNameButton = new JButton(mainController.getPlayerTwo()
-			.getName());
+		playerTwoNameButton = new JButton(mainController.getPlayerTwo().getName());
 		playerTwoNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -215,33 +131,14 @@ public class GamePanel extends JPanel {
 					.getName(), JOptionPane.QUESTION_MESSAGE);
 				if (name != null && !("").equals(name)) {
 					playerTwoNameButton.setText(name);
-					mainController.getPlayerTwo()
-						.setName(name);
-	    playerOnePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		
-		playerTwoPanel = new JPanel();
-		boxLayout = new BoxLayout(playerTwoPanel, BoxLayout.Y_AXIS);
-		playerTwoPanel.setLayout(boxLayout);
-		
-		playerTwoIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("red"), playerLabelSize, playerLabelSize, true));
-		playerIconLabelSettings(playerTwoIconLabel);
-		
-		playerTwoNameButton = new JButton(mainController.getPlayerTwo().getName());
-		playerTwoNameButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerTwo().getName(), JOptionPane.QUESTION_MESSAGE);
-				if(name != null && !("").equals(name)) {
-					playerTwoNameButton.setText(name);
 					mainController.getPlayerTwo().setName(name);
-				}
+	    		}
 			}
 		});
 		playerButtonSettings(playerTwoNameButton);
 		setBGWhiteFGBlack(playerTwoNameButton);
 
-		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo()
-			.getReservedSpots()));
+		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
 		playerButtonSettings(playerTwoScoreButton);
 		setBGWhiteFGBlack(playerTwoScoreButton);
 
@@ -253,20 +150,6 @@ public class GamePanel extends JPanel {
 		add(center, BorderLayout.CENTER);
 		add(playerOnePanel, BorderLayout.LINE_START);
 		add(playerTwoPanel, BorderLayout.LINE_END);
-
-		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
-		playerButtonSettings(playerTwoScoreButton);
-		setBGWhiteFGBlack(playerTwoScoreButton);
-		
-		playerTwoPanel.add(playerTwoIconLabel);
-		playerTwoPanel.add(playerTwoNameButton);
-		playerTwoPanel.add(playerTwoScoreButton);
-	    playerTwoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		
-		add(center, BorderLayout.CENTER);
-		add(playerOnePanel, BorderLayout.LINE_START);
-		add(playerTwoPanel, BorderLayout.LINE_END);
-		
 		return this;
 	}
 
@@ -377,31 +260,6 @@ public class GamePanel extends JPanel {
 	}
 
 	public void updateFields() {
-		if (this.mainController.getActualPlayer()
-			.getName()
-			.equals(playerOneNameButton.getText())) {
-			setBGBlackFGWhite(playerOneNameButton);
-			setBGBlackFGWhite(playerOneScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
-				.getReservedSpots()));
-
-			setBGWhiteFGBlack(playerTwoNameButton);
-			setBGWhiteFGBlack(playerTwoScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
-				.getReservedSpots()));
-		} else {
-			setBGBlackFGWhite(playerTwoNameButton);
-			setBGBlackFGWhite(playerTwoScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
-				.getReservedSpots()));
-
-			setBGWhiteFGBlack(playerOneNameButton);
-			setBGWhiteFGBlack(playerOneScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
-				.getReservedSpots()));
-		}
-		for (int i = 0; i < this.mainController.getTableSize(); i++) {
-			for (int j = 0; j < this.mainController.getTableSize(); j++) {
 		if(this.mainController.getActualPlayer().getName().equals(playerOneNameButton.getText())) {
 			setBGBlackFGWhite(playerOneNameButton);
 			setBGBlackFGWhite(playerOneScoreButton);
@@ -467,17 +325,8 @@ public class GamePanel extends JPanel {
 		}
 	}
 
-	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) {
-		playerOneIconLabel.setIcon(blobPlayerLabel);
-	}
-
-	public void updatePlayerTwoLabel(ImageIcon blobPlayerLabel) {
-		playerTwoIconLabel.setIcon(blobPlayerLabel);
-	}
-
 	public void setWon(boolean b) {
 		won = b;
-
 	}
 
 	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) { playerOneIconLabel.setIcon(blobPlayerLabel); }	
