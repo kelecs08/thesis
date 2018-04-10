@@ -11,11 +11,11 @@ import hu.elte.thesis.controller.MainController;
 import hu.elte.thesis.model.Player;
 import hu.elte.thesis.model.Position;
 
-public class FileMenuService {
+public class GameMenuService {
 	
 	private MainController mainController;
 	
-	public FileMenuService(MainController mainController) {
+	public GameMenuService(MainController mainController) {
 		this.mainController = mainController;
 	}
 

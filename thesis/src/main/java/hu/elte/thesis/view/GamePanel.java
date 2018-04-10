@@ -20,10 +20,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.minimax.RootChild;
 import hu.elte.thesis.model.Blobs;
-import hu.elte.thesis.model.GameType;
 import hu.elte.thesis.model.Player;
-import hu.elte.thesis.model.Position;
 import hu.elte.thesis.view.dto.SimplePosition;
 import hu.elte.thesis.view.service.ImageResizingService;
 import hu.elte.thesis.view.service.PropertyService;
@@ -32,29 +31,27 @@ public class GamePanel extends JPanel {
 
 	private static final long serialVersionUID = -3559703782267201891L;
 
-	private boolean won = false;
+	private final MainController mainController;
+	private final ImageResizingService imageResizingService;
+	private final PropertyService propertyService;
+	private final Properties iconProperties;
 
-	private MainController mainController;
-	private ImageResizingService imageResizingService;
-	private PropertyService propertyService;
-	private Properties iconProperties;
-	
 	private ImageIcon playerOneImage;
 	private ImageIcon playerTwoImage;
-	
+
 	private JPanel center;
 	private JPanel playerOnePanel;
 	private JPanel playerTwoPanel;
-	
+
 	private JLabel playerOneIconLabel;
 	private JLabel playerTwoIconLabel;
-	
+
 	private JButton playerOneNameButton;
 	private JButton playerTwoNameButton;
-	
+
 	private JButton playerOneScoreButton;
 	private JButton playerTwoScoreButton;
-	
+
 	public GamePanel(MainController mainController) {
 		super(new BorderLayout());
 		this.mainController = mainController;
@@ -66,18 +63,38 @@ public class GamePanel extends JPanel {
 		this.playerOneImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.BLUE.getBlobColorString()), playerSize, playerSize, false);
 		this.playerTwoImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.RED.getBlobColorString()), playerSize, playerSize, true);
 	}
-	
-	public ImageIcon getPlayerOneImage() { return playerOneImage; }
-	public void setPlayerOneImage(ImageIcon playerOneImage) { this.playerOneImage = playerOneImage;	}
 
-	public ImageIcon getPlayerTwoImage() { return playerTwoImage; }
-	public void setPlayerTwoImage(ImageIcon playerTwoImage) { this.playerTwoImage = playerTwoImage;	}
+	public ImageIcon getPlayerOneImage() {
+		return playerOneImage;
+	}
 
-	public JLabel getPlayerOneIconLabel() {	return playerOneIconLabel; }
-	public void setPlayerOneIconLabel(JLabel playerOneIconLabel) {	this.playerOneIconLabel = playerOneIconLabel; }
+	public void setPlayerOneImage(ImageIcon playerOneImage) {
+		this.playerOneImage = playerOneImage;
+	}
 
-	public JLabel getPlayerTwoIconLabel() {	return playerTwoIconLabel; }
-	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) { this.playerTwoIconLabel = playerTwoIconLabel;}
+	public ImageIcon getPlayerTwoImage() {
+		return playerTwoImage;
+	}
+
+	public void setPlayerTwoImage(ImageIcon playerTwoImage) {
+		this.playerTwoImage = playerTwoImage;
+	}
+
+	public JLabel getPlayerOneIconLabel() {
+		return playerOneIconLabel;
+	}
+
+	public void setPlayerOneIconLabel(JLabel playerOneIconLabel) {
+		this.playerOneIconLabel = playerOneIconLabel;
+	}
+
+	public JLabel getPlayerTwoIconLabel() {
+		return playerTwoIconLabel;
+	}
+
+	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) {
+		this.playerTwoIconLabel = playerTwoIconLabel;
+	}
 
 	public JPanel createInitialTableBoard() {
 		center = new JPanel();
@@ -93,7 +110,8 @@ public class GamePanel extends JPanel {
 		playerOneIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("blue"), playerLabelSize, playerLabelSize, false));
 		playerIconLabelSettings(playerOneIconLabel);
 
-		playerOneNameButton = new JButton(mainController.getPlayerOne().getName());
+		playerOneNameButton = new JButton(mainController.getPlayerOne()
+			.getName());
 		playerOneNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -101,13 +119,15 @@ public class GamePanel extends JPanel {
 					.getName(), JOptionPane.QUESTION_MESSAGE);
 				if (name != null && !("").equals(name) && name.length() <= 10) {
 					playerOneNameButton.setText(name);
-					mainController.getPlayerOne().setName(name);
+					mainController.getPlayerOne()
+						.setName(name);
 				}
 			}
 		});
-	 	playerButtonSettings(playerOneNameButton);
-		setBGBlackFGWhite(playerOneNameButton);		
-		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
+		playerButtonSettings(playerOneNameButton);
+		setBGBlackFGWhite(playerOneNameButton);
+		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne()
+			.getReservedSpots()));
 		playerButtonSettings(playerOneScoreButton);
 		setBGBlackFGWhite(playerOneScoreButton);
 
@@ -123,7 +143,8 @@ public class GamePanel extends JPanel {
 		playerTwoIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("red"), playerLabelSize, playerLabelSize, true));
 		playerIconLabelSettings(playerTwoIconLabel);
 
-		playerTwoNameButton = new JButton(mainController.getPlayerTwo().getName());
+		playerTwoNameButton = new JButton(mainController.getPlayerTwo()
+			.getName());
 		playerTwoNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -131,14 +152,16 @@ public class GamePanel extends JPanel {
 					.getName(), JOptionPane.QUESTION_MESSAGE);
 				if (name != null && !("").equals(name)) {
 					playerTwoNameButton.setText(name);
-					mainController.getPlayerTwo().setName(name);
-	    		}
+					mainController.getPlayerTwo()
+						.setName(name);
+				}
 			}
 		});
 		playerButtonSettings(playerTwoNameButton);
 		setBGWhiteFGBlack(playerTwoNameButton);
 
-		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
+		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo()
+			.getReservedSpots()));
 		playerButtonSettings(playerTwoScoreButton);
 		setBGWhiteFGBlack(playerTwoScoreButton);
 
@@ -157,7 +180,7 @@ public class GamePanel extends JPanel {
 		button.setBackground(Color.BLACK);
 		button.setForeground(Color.WHITE);
 	}
-	
+
 	private void setBGWhiteFGBlack(JButton button) {
 		button.setBackground(Color.WHITE);
 		button.setForeground(Color.BLACK);
@@ -197,8 +220,6 @@ public class GamePanel extends JPanel {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(mainController.getActualPlayer()
-					.toString());
 				if (mainController.isClickOne(i, j)) {
 					button.setBackground(Color.BLACK);
 					renderFirstLevelFields();
@@ -208,17 +229,26 @@ public class GamePanel extends JPanel {
 				} else if (!mainController.isClickOne(i, j)) {
 					if (mainController.step(i, j)) {
 						updateFields();
-						Position position = mainController.stepWithComputer();
-						if (position != null) {
-							updateFields();
-							if (!won) {
-								renderField(position.getRow() - 2, position.getColumn() - 2, Color.BLACK);
-							} else {
-								won = false;
+						if (!checkWinning()) {
+							RootChild rootChild = mainController.stepWithComputer();
+							if (rootChild != null) {
+								updateFields();
+								renderField(rootChild.getRootPosition()
+									.getRow() - 2,
+										rootChild.getRootPosition()
+											.getColumn() - 2,
+										Color.YELLOW);
+								renderField(rootChild.getBestChildPosition()
+									.getRow() - 2,
+										rootChild.getBestChildPosition()
+											.getColumn() - 2,
+										Color.BLACK);
+								checkWinning();
 							}
 						}
 					}
 				}
+				checkWinning();
 			}
 		});
 		center.add(button);
@@ -239,13 +269,13 @@ public class GamePanel extends JPanel {
 			field.setBackground(color);
 		}
 	}
-	
+
 	public void renderField(int row, int column, Color color) {
 		Component component = center.getComponent(row * mainController.getTableSize() + column);
 		JButton field = (JButton) component;
 		field.setBackground(color);
 	}
-	
+
 	private void setInitialButtonAppearance(JButton button, int i, int j) {
 		button.setPreferredSize(new Dimension(70, 70));
 		button.setBackground(Color.LIGHT_GRAY);
@@ -260,25 +290,9 @@ public class GamePanel extends JPanel {
 	}
 
 	public void updateFields() {
-		if(this.mainController.getActualPlayer().getName().equals(playerOneNameButton.getText())) {
-			setBGBlackFGWhite(playerOneNameButton);
-			setBGBlackFGWhite(playerOneScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
-
-			setBGWhiteFGBlack(playerTwoNameButton);
-			setBGWhiteFGBlack(playerTwoScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
-		} else {
-			setBGBlackFGWhite(playerTwoNameButton);
-			setBGBlackFGWhite(playerTwoScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
-
-			setBGWhiteFGBlack(playerOneNameButton);
-			setBGWhiteFGBlack(playerOneScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));	
-		}
-		for(int i = 0; i < this.mainController.getTableSize(); i++) {
-			for(int j = 0; j < this.mainController.getTableSize(); j++) {
+		updateActualPlayerView();
+		for (int i = 0; i < this.mainController.getTableSize(); i++) {
+			for (int j = 0; j < this.mainController.getTableSize(); j++) {
 				Component component = center.getComponent(i * this.mainController.getTableSize() + j);
 				JButton field = (JButton) component;
 				if (this.mainController.isPlayerOneField(i, j)) {
@@ -291,44 +305,67 @@ public class GamePanel extends JPanel {
 				field.setBackground(Color.LIGHT_GRAY);
 			}
 		}
-		checkWinning();
 	}
 
-	private void checkWinning() {
-		won = false;
+	private void updateActualPlayerView() {
+		if (this.mainController.getActualPlayer()
+			.getName()
+			.equals(playerOneNameButton.getText())) {
+			setBGBlackFGWhite(playerOneNameButton);
+			setBGBlackFGWhite(playerOneScoreButton);
+			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
+				.getReservedSpots()));
+
+			setBGWhiteFGBlack(playerTwoNameButton);
+			setBGWhiteFGBlack(playerTwoScoreButton);
+			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
+				.getReservedSpots()));
+		} else {
+			setBGBlackFGWhite(playerTwoNameButton);
+			setBGBlackFGWhite(playerTwoScoreButton);
+			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
+				.getReservedSpots()));
+
+			setBGWhiteFGBlack(playerOneNameButton);
+			setBGWhiteFGBlack(playerOneScoreButton);
+			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
+				.getReservedSpots()));
+		}
+	}
+
+	private boolean checkWinning() {
 		if (this.mainController.isDraw()) {
-			won = true;
 			JOptionPane.showMessageDialog(this, "Game over!\nThe game ended in a draw.");
 			mainController.startNewGame();
-			if(this.mainController.getGameType().equals(GameType.ONE_PLAYER))
-				this.mainController.startNewGame(true);
-			else
-				this.mainController.startNewGame(false);
+			return true;
 		}
 		Player winner = this.mainController.getWinner();
 		if (winner != null) {
-			won = true;
 			JOptionPane.showMessageDialog(this, "Game over!\nThe winner is player " + winner.getName() + " !! :D");
 			mainController.startNewGame();
+			return true;
 		}
+
 		if (!mainController.areStepsAvailable()) {
 			if (mainController.isDrawWhenStepsAreNotAvailable()) {
-				won = true;
 				JOptionPane.showMessageDialog(this, "Game over!\nThe game ended in a draw due to not being able to step.");
 				mainController.startNewGame();
+				return true;
 			} else {
-				won = true;
 				Player winner2 = mainController.getWinnerWhenStepsAreNotAvailable();
 				JOptionPane.showMessageDialog(this, "Game over!\nThe game ended due to not being able to step.\nThe winner is " + winner2.getName() + " !! :D");
 				mainController.startNewGame();
+				return true;
 			}
 		}
+		return false;
 	}
 
-	public void setWon(boolean b) {
-		won = b;
+	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) {
+		playerOneIconLabel.setIcon(blobPlayerLabel);
 	}
 
-	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) { playerOneIconLabel.setIcon(blobPlayerLabel); }	
-	public void updatePlayerTwoLabel(ImageIcon blobPlayerLabel) { playerTwoIconLabel.setIcon(blobPlayerLabel); }	
+	public void updatePlayerTwoLabel(ImageIcon blobPlayerLabel) {
+		playerTwoIconLabel.setIcon(blobPlayerLabel);
+	}
 }

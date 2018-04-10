@@ -1,6 +1,5 @@
 package hu.elte.thesis.controller;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +7,11 @@ import hu.elte.thesis.controller.service.PlayerService;
 import hu.elte.thesis.controller.service.TableBoardService;
 import hu.elte.thesis.minimax.MinimaxAlgorithm;
 import hu.elte.thesis.minimax.RootChild;
-import hu.elte.thesis.minimax.Node;
-import hu.elte.thesis.minimax.Tree;
+import hu.elte.thesis.model.ComputerPlayerDifficulty;
 import hu.elte.thesis.model.GameType;
 import hu.elte.thesis.model.Player;
 import hu.elte.thesis.model.Position;
+import hu.elte.thesis.random.RandomAlgorithm;
 import hu.elte.thesis.view.MainWindow;
 import hu.elte.thesis.view.dto.SimplePosition;
 
@@ -30,6 +29,7 @@ public class MainController {
 	private Position[][] tableBoardPositions;
 
 	private GameType gameType = GameType.TWO_PLAYER;
+	private ComputerPlayerDifficulty computerPlayerDifficulty = ComputerPlayerDifficulty.EASY;
 
 	private Player playerOne, playerTwo;
 	private Player actualPlayer;
@@ -39,6 +39,7 @@ public class MainController {
 	private List<Position> firstLevel, secondLevel;
 
 	private final MinimaxAlgorithm minimaxAlgorithm = new MinimaxAlgorithm();
+	private final RandomAlgorithm randomAlgorithm = new RandomAlgorithm();
 	private final TableBoardService tableBoardService = new TableBoardService();
 	private final PlayerService playerService = new PlayerService();
 
@@ -91,9 +92,9 @@ public class MainController {
 		this.playerService.updatePlayers(playerOne, playerTwo, playerTwo.isComputerPlayer());
 		fillDefaultTableBoard();
 	}
-		
+
 	public void fillDefaultTableBoard() {
-		tableBoardService.fillDefaultTableBoard(tableSize, tableBoardPositions, playerOne, playerTwo);	
+		tableBoardService.fillDefaultTableBoard(tableSize, tableBoardPositions, playerOne, playerTwo);
 	}
 
 	public boolean isPlayerOneField(int row, int column) {
@@ -118,12 +119,14 @@ public class MainController {
 		return this.tableBoardPositions[row + 2][column + 2].getPlayer();
 	}
 
-
-	public boolean isClickOne(int row, int column) {			
-		if(this.clickedPosition != null) return false; 				//someone already clicked before
-		Position position = this.tableBoardPositions[row][column]; 	//the clicked position
-		Player player = position.getPlayer(); 						//the player in the clicked position --> player1, player2, null !!
-		if(player != null && player.equals(actualPlayer) && !actualPlayer.isComputerPlayer() && tableBoardService.checkStepAvailable(position, tableBoardPositions)) {
+	public boolean isClickOne(int row, int column) {
+		if (this.clickedPosition != null) {
+			return false; // someone already clicked before
+		}
+		Position position = this.tableBoardPositions[row][column]; // the clicked position
+		Player player = position.getPlayer(); // the player in the clicked position --> player1, player2, null !!
+		if (player != null && player.equals(actualPlayer) && !actualPlayer.isComputerPlayer()
+				&& tableBoardService.checkStepAvailable(position, tableBoardPositions)) {
 			this.clickedPosition = position;
 		}
 		return this.clickedPosition != null;
@@ -272,7 +275,7 @@ public class MainController {
 		return this.tableBoardService.checkStepsAvailableForAllPlayerField(positions, tableBoardPositions);
 	}
 
-	public Position stepWithComputer() {
+	public RootChild stepWithComputer() {
 		if (playerTwo.isComputerPlayer()) {
 			List<Position> rootPositions = new ArrayList<>();
 			for (int i = 2; i < tableSize + 2; i++) {
@@ -283,14 +286,12 @@ public class MainController {
 					}
 				}
 			}
-
-		/*	Tree bestTree = minimaxAlgorithm.getPositionToBeStepped(rootPositions, 1, tableBoardPositions);
-			Position rootPosition = bestTree.getRoot()
-				.getPosition();
-			Position positionToStep = bestTree.getBestChildren()
-				.get(0)
-				.getPosition();*/
-			RootChild rootChild = minimaxAlgorithm.getRootAndPositionToBeStepped(rootPositions, 1, tableBoardPositions);
+			RootChild rootChild = null;
+			if (this.computerPlayerDifficulty == ComputerPlayerDifficulty.EASY) {
+				rootChild = randomAlgorithm.getRandomRootChild(rootPositions, tableBoardPositions);
+			} else {
+				rootChild = minimaxAlgorithm.getRootAndPositionToBeStepped(rootPositions, 1, tableBoardPositions);
+			}
 			Position rootPosition = rootChild.getRootPosition();
 			Position positionToStep = rootChild.getBestChildPosition();
 			if (positionToStep != null) {
@@ -303,72 +304,89 @@ public class MainController {
 				}
 				overtakeFields(positionToStep, playerTwo);
 				updateDataFields();
-				mainWindow.getGamePanel()
-					.renderField(rootPosition.getRow() - 2, rootPosition.getColumn() - 2, Color.YELLOW);
-				return positionToStep;
-			}
-		}
-			return null;
-	}
-	
-	public Player getOtherPlayer(Player player) {
-		if(player.equals(playerOne)) return playerTwo;
-		return playerOne;
-	}
-	
-	public Player getWinner() {	return playerService.getWinner(tableSize*tableSize, playerOne, playerTwo); }
-	public boolean isDraw() { return playerService.isDraw(tableSize*tableSize, playerOne, playerTwo); }
-
-/*	public Position stepWithComputer() { //TODO: array to be passed as rootPosition
-		if(playerTwo.isComputerPlayer()) {
-			List<Position> rootPositions = new ArrayList<>();
-			for(int i = 2; i < tableSize+2; i++) {
-				for(int j = 2; j < tableSize+2; j++) {
-					Player tmp = tableBoardPositions[i][j].getPlayer();
-					if(tmp != null) {
-						if(tmp.isComputerPlayer()) {
-							rootPositions.add(tableBoardPositions[i][j]);
-						}
-					}
-				}
-			}
-			Tree bestTree = minimaxAlgorithm.getPositionToBeStepped(rootPositions, 1, tableBoardPositions);
-			Position rootPosition = bestTree.getRoot().getPosition();
-			Position positionToStep = bestTree.getBestChildren().get(0).getPosition();
-			if(positionToStep != null) {
-				positionToStep.setPlayer(playerTwo);
-				int score = bestTree.getBestChildren().get(0).getScore();
-				if(score % 10 == 1) playerTwo.modifyReservedSpotsNumber(1);
-				else if(score % 10 == 0) tableBoardPositions[rootPosition.getRow()][rootPosition.getColumn()].setPlayer(null);
-				overtakeFields(positionToStep, playerTwo);
-				updateDataFields();
-				mainWindow.getGamePanel().renderField(rootPosition.getRow()-2, rootPosition.getColumn()-2, Color.YELLOW);
-				return positionToStep;
+				return rootChild;
 			}
 		}
 		return null;
-	}*/
-	
-	public MainWindow getMainWindow() {	return this.mainWindow; }
-	public void setMainWindow(MainWindow mainWindow) { this.mainWindow = mainWindow; }
-	
-	public GameType getGameType() {	return this.gameType; }
-	public void setGameType(GameType gameType) { this.gameType = gameType; }
-	
-	public Position[][] getTableBoardPositions() { return this.tableBoardPositions; }
-	public void setTableBoardPositions(Position[][] tableBoardPositions2) { this.tableBoardPositions = tableBoardPositions; }
-	
-	public int getTableSize() {	return this.tableSize; }
-	public void setTableSize(int tableSize) { this.tableSize = tableSize; }
-	
-	public Player getActualPlayer() { return this.actualPlayer;	}
-	public void setActualPlayer(Player actualPlayer) { this.actualPlayer = actualPlayer; }
-	
-	public Player getPlayerOne() { return playerOne; }
-	public void setPlayerOne(Player playerOne) { this.playerOne = playerOne; }
-	
-	public Player getPlayerTwo() { return playerTwo; }
-	public void setPlayerTwo(Player playerTwo) { this.playerTwo = playerTwo; }
-	
+	}
+
+	public Player getOtherPlayer(Player player) {
+		if (player.equals(playerOne)) {
+			return playerTwo;
+		}
+		return playerOne;
+	}
+
+	public Player getWinner() {
+		return playerService.getWinner(tableSize * tableSize, playerOne, playerTwo);
+	}
+
+	public boolean isDraw() {
+		return playerService.isDraw(tableSize * tableSize, playerOne, playerTwo);
+	}
+
+	public MainWindow getMainWindow() {
+		return this.mainWindow;
+	}
+
+	public void setMainWindow(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
+	}
+
+	public GameType getGameType() {
+		return this.gameType;
+	}
+
+	public void setGameType(GameType gameType) {
+		this.gameType = gameType;
+	}
+
+	public ComputerPlayerDifficulty getComputerPlayerDifficulty() {
+		return this.computerPlayerDifficulty;
+	}
+
+	public void setComputerPlayerDifficulty(ComputerPlayerDifficulty computerPlayerDifficulty) {
+		this.computerPlayerDifficulty = computerPlayerDifficulty;
+	}
+
+	public Position[][] getTableBoardPositions() {
+		return this.tableBoardPositions;
+	}
+
+	public void setTableBoardPositions(Position[][] tableBoardPositions2) {
+		this.tableBoardPositions = tableBoardPositions;
+	}
+
+	public int getTableSize() {
+		return this.tableSize;
+	}
+
+	public void setTableSize(int tableSize) {
+		this.tableSize = tableSize;
+	}
+
+	public Player getActualPlayer() {
+		return this.actualPlayer;
+	}
+
+	public void setActualPlayer(Player actualPlayer) {
+		this.actualPlayer = actualPlayer;
+	}
+
+	public Player getPlayerOne() {
+		return playerOne;
+	}
+
+	public void setPlayerOne(Player playerOne) {
+		this.playerOne = playerOne;
+	}
+
+	public Player getPlayerTwo() {
+		return playerTwo;
+	}
+
+	public void setPlayerTwo(Player playerTwo) {
+		this.playerTwo = playerTwo;
+	}
 
 }
