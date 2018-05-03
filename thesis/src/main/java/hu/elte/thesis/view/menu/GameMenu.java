@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -12,27 +13,42 @@ import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
-import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.model.ComputerPlayerDifficulty;
 import hu.elte.thesis.model.GameType;
-import hu.elte.thesis.view.service.GameMenuService;
+import hu.elte.thesis.view.service.FileHandleService;
 import hu.elte.thesis.view.service.ImageResizingService;
+import hu.elte.thesis.view.service.PropertyService;
 
+/**
+ * The implementation of the Game menu.
+ * 
+ * @author kelecs08
+ */
 public class GameMenu extends JMenu {
 
 	private static final long serialVersionUID = -182494725336616083L;
 
-	private final MainController mainController;
+	private final MainControllerInterface mainController;
 	private final ImageResizingService imageResizingService;
-	private final GameMenuService gameMenuService;
+	private final FileHandleService fileHandleService;
+	private PropertyService propertyService;
+	private Properties iconProperties;
 
-	public GameMenu(MainController mainController) {
+	public GameMenu(MainControllerInterface mainController) {
 		super("Game");
 		this.mainController = mainController;
 		this.imageResizingService = new ImageResizingService();
-		this.gameMenuService = new GameMenuService(mainController);
+		this.fileHandleService = new FileHandleService(mainController);
+		this.propertyService = new PropertyService();
+		this.iconProperties = this.propertyService.loadIconProperties();
 	}
 
+	/**
+	 * Get the initialized Game menu.
+	 * @return
+	 * 		this object
+	 */
 	public GameMenu getFileMenu() {
 		addNewGameMenuItem();
 		addSaveGameMenuItem();
@@ -42,12 +58,15 @@ public class GameMenu extends JMenu {
 		return this;
 	}
 
+	/**
+	 * Creates new game menu item and adds it to the menu.
+	 */
 	private void addNewGameMenuItem() {
-		ImageIcon newIcon = imageResizingService.resizeImage("images/icons/new_icon.jpg", false);
+		ImageIcon newIcon = imageResizingService.resizeImage(iconProperties.getProperty("new"), false);
 		JMenu newGame = new JMenu("New...");
 		newGame.setIcon(newIcon);
 
-		JMenu newComputerGame = new JMenu("New one-player game");
+		JMenu newComputerGame = new JMenu("One-player game");
 
 		JMenuItem newOnePlayerGameEasy = new JMenuItem("easy");
 		newOnePlayerGameEasy.addActionListener(new ActionListener() {
@@ -55,6 +74,7 @@ public class GameMenu extends JMenu {
 			public void actionPerformed(ActionEvent e) {
 				mainController.setGameType(GameType.ONE_PLAYER);
 				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.EASY);
+				mainController.setPlayerTwoName("Computer");
 				mainController.startNewGame(true);
 			}
 		});
@@ -65,17 +85,31 @@ public class GameMenu extends JMenu {
 			public void actionPerformed(ActionEvent e) {
 				mainController.setGameType(GameType.ONE_PLAYER);
 				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.MEDIUM);
+				mainController.setPlayerTwoName("Computer");
+				mainController.startNewGame(true);
+			}
+		});
+		
+		JMenuItem newOnePlayerGameHard = new JMenuItem("hard");
+		newOnePlayerGameHard.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainController.setGameType(GameType.ONE_PLAYER);
+				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.HARD);
+				mainController.setPlayerTwoName("Computer");
 				mainController.startNewGame(true);
 			}
 		});
 		newComputerGame.add(newOnePlayerGameEasy);
 		newComputerGame.add(newOnePlayerGameMedium);
+		newComputerGame.add(newOnePlayerGameHard);
 
-		JMenuItem newTwoPlayerGame = new JMenuItem("New two-player game");
+		JMenuItem newTwoPlayerGame = new JMenuItem("Two-player game");
 		newTwoPlayerGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainController.setGameType(GameType.TWO_PLAYER);
+				mainController.setPlayerTwoName("Player2");
 				mainController.startNewGame(false);
 			}
 		});
@@ -85,14 +119,16 @@ public class GameMenu extends JMenu {
 		add(newGame);
 	}
 
+	/**
+	 * Creates save game menu item and adds it to the menu.
+	 */
 	private void addSaveGameMenuItem() {
-		ImageIcon saveIcon = imageResizingService.resizeImage("images/icons/save_icon.jpg", false);
-		JMenuItem saveGame = new JMenuItem("Save", saveIcon);
+		ImageIcon saveIcon = imageResizingService.resizeImage(iconProperties.getProperty("save"), false);
+		JMenuItem saveGame = new JMenuItem("Save game", saveIcon);
 		saveGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView()
-					.getHomeDirectory());
+				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
 				fileChooser.setAcceptAllFileFilterUsed(false);
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Custom file format (*.an)", "an");
@@ -101,8 +137,8 @@ public class GameMenu extends JMenu {
 				int returnValue = fileChooser.showSaveDialog(mainController.getMainWindow());
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					try {
-						gameMenuService.writeToFile(fileChooser.getSelectedFile() + ".an", mainController.getActualPlayer(), mainController.getPlayerOne(),
-								mainController.getPlayerTwo(), mainController.getTableBoardPositions());
+						fileHandleService.writeToFile(fileChooser.getSelectedFile() + ".an", mainController.getActualPlayer(), mainController.getPlayerOne(),
+								mainController.getPlayerTwo(), mainController.getTableBoardPositions(), mainController.getGameType(), mainController.getComputerPlayerDifficulty());
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
@@ -113,13 +149,12 @@ public class GameMenu extends JMenu {
 	}
 
 	private void addLoadGameMenuItem() {
-		ImageIcon loadIcon = imageResizingService.resizeImage("images/icons/load_icon.jpg", false);
+		ImageIcon loadIcon = imageResizingService.resizeImage(iconProperties.getProperty("load"), false);
 		JMenuItem loadGame = new JMenuItem("Load game", loadIcon);
 		loadGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView()
-					.getHomeDirectory());
+				JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
 				fileChooser.setAcceptAllFileFilterUsed(false);
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Custom file format (*.an)", "an");
@@ -129,10 +164,7 @@ public class GameMenu extends JMenu {
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					try {
 						File selectedFile = fileChooser.getSelectedFile();
-						gameMenuService.loadFromFile(selectedFile);
-						mainController.getMainWindow()
-							.getGamePanel()
-							.updateFields();
+						fileHandleService.loadFromFile(selectedFile);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -143,7 +175,7 @@ public class GameMenu extends JMenu {
 	}
 
 	private void addExitMenuItem() {
-		ImageIcon exitIcon = imageResizingService.resizeImage("images/icons/exit_icon.jpg", false);
+		ImageIcon exitIcon = imageResizingService.resizeImage(iconProperties.getProperty("exit"), false);
 		JMenuItem exitGame = new JMenuItem("Exit", exitIcon);
 		exitGame.addActionListener(new ActionListener() {
 			@Override

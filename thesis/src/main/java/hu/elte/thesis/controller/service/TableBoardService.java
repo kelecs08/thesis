@@ -7,8 +7,20 @@ import hu.elte.thesis.controller.MainController;
 import hu.elte.thesis.model.Player;
 import hu.elte.thesis.model.Position;
 
+/**
+ * Service class for table board's positions.
+ * 
+ * @author kelecs08
+ */
 public class TableBoardService {
 
+	/**
+	 * Fills up the given tableBoardPositions with default values.
+	 * @param tableSize
+	 * @param tableBoardPositions
+	 * @param playerOne
+	 * @param playerTwo
+	 */
 	public void fillDefaultTableBoard(int tableSize, Position[][] tableBoardPositions, Player playerOne, Player playerTwo) {
 		int additionalTableSize = tableSize + MainController.ADDITIONAL_FIELDS;
 		for (int i = 0; i < 2; i++) { // first two row, column
@@ -35,6 +47,12 @@ public class TableBoardService {
 		tableBoardPositions[additionalTableSize - 3][additionalTableSize - 3] = new Position(additionalTableSize - 3, additionalTableSize - 3, playerTwo, true);
 	}
 
+	/**
+	 * Returns the first level positions of the given position.
+	 * @param position
+	 * @param tableBoardPositions
+	 * @return list of {@link Position}
+	 */
 	public List<Position> getFirstLevel(Position position, Position[][] tableBoardPositions) {
 		List<Position> firstLevelPositions = new ArrayList<>();
 		int row = position.getRow();
@@ -50,6 +68,12 @@ public class TableBoardService {
 		return firstLevelPositions;
 	}
 
+	/**
+	 * Returns the empty first level positions of the given position.
+	 * @param position
+	 * @param tableBoardPositions
+	 * @return list of {@link Position}
+	 */
 	public List<Position> getEmptyFirstLevelPositions(Position position, Position[][] tableBoardPositions) {
 		List<Position> firstLevelPositions = new ArrayList<>();
 		int row = position.getRow();
@@ -65,6 +89,12 @@ public class TableBoardService {
 		return firstLevelPositions;
 	}
 
+	/**
+	 * Returns the second level positions of the given position.
+	 * @param position
+	 * @param tableBoardPositions
+	 * @return list of {@link Position}
+	 */
 	public List<Position> getSecondLevel(Position position, Position[][] tableBoardPositions) {
 		List<Position> firstLevelPositions = getFirstLevel(position, tableBoardPositions);
 		List<Position> secondLevelPositions = new ArrayList<>();
@@ -82,6 +112,12 @@ public class TableBoardService {
 		return secondLevelPositions;
 	}
 
+	/**
+	 * Returns the empty second level positions of the given position.
+	 * @param position
+	 * @param tableBoardPositions
+	 * @return list of {@link Position}
+	 */
 	public List<Position> getEmptySecondLevelPositions(Position position, Position[][] tableBoardPositions) {
 		List<Position> firstLevelPositions = getEmptyFirstLevelPositions(position, tableBoardPositions);
 		List<Position> secondLevelPositions = new ArrayList<>();
@@ -99,6 +135,12 @@ public class TableBoardService {
 		return secondLevelPositions;
 	}
 
+	/**
+	 * Checks whether steps are available for the given positions.
+	 * @param positions
+	 * @param tableBoardPositions
+	 * @return boolean
+	 */
 	public boolean checkStepsAvailableForAllPlayerField(List<Position> positions, Position[][] tableBoardPositions) {
 		for (Position p : positions) {
 			if (checkStepAvailable(p, tableBoardPositions)) {
@@ -108,6 +150,12 @@ public class TableBoardService {
 		return false;
 	}
 
+	/**
+	 * Checks whether steps are available for the given position.
+	 * @param position
+	 * @param tableBoardPositions
+	 * @return boolean
+	 */
 	public boolean checkStepAvailable(Position position, Position[][] tableBoardPositions) {
 		List<Position> firstLevel = getFirstLevel(position, tableBoardPositions);
 		List<Position> secondLevel = getSecondLevel(position, tableBoardPositions);
@@ -121,6 +169,51 @@ public class TableBoardService {
 				return true;
 			}
 		}
+		return false;
+	}
+	
+	/**
+	 * Returns the positions in which the given player has blobs.
+	 * @param tableBoardPositions
+	 * @param player
+	 * @return list of {@link Position}
+	 */
+	public List<Position> getPositionsForGivenPlayer(Position[][] tableBoardPositions, Player player) {
+		List<Position> rootPositions = new ArrayList<>();
+		for (int i = 2; i < tableBoardPositions.length - 2; i++) {
+			for (int j = 2; j < tableBoardPositions.length - 2; j++) {
+				Player tmp = tableBoardPositions[i][j].getPlayer();
+				if (tmp != null && tmp.equals(player)) {
+					rootPositions.add(tableBoardPositions[i][j]);
+				}
+			}
+		}
+		return rootPositions;
+	}
+	
+	/**
+	 * Checks whether the given child is a first level position of the given root.
+	 * @param tableBoardPositions
+	 * @param root
+	 * @param child
+	 * @return
+	 */
+	public boolean isFirstLevelPositionOfTheGivenPosition(Position[][] tableBoardPositions, Position root, Position child) {
+		List<Position> firstLevel = getEmptyFirstLevelPositions(root, tableBoardPositions);
+		if(firstLevel.contains(child)) return true;
+		return false;
+	}
+	
+	/**
+	 * Checks whether the given child is a second level position of the given root.
+	 * @param tableBoardPositions
+	 * @param root
+	 * @param child
+	 * @return
+	 */
+	public boolean isSecondLevelPositionOfTheGivenPosition(Position[][] tableBoardPositions, Position root, Position child) {
+		List<Position> secondLevel = getEmptySecondLevelPositions(root, tableBoardPositions);
+		if(secondLevel.contains(child)) return true;
 		return false;
 	}
 }

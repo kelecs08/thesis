@@ -1,7 +1,10 @@
-package hu.elte.thesis.minimax;
+package hu.elte.thesis.model;
 
-import hu.elte.thesis.model.Position;
-
+/**
+ * Data transfer object for @link Position.
+ * 
+ * @author kelecs08
+ */
 public class RootChild {
 
 	private Position rootPosition;

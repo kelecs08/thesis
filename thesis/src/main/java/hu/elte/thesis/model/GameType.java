@@ -1,16 +1,23 @@
 package hu.elte.thesis.model;
 
+/**
+ * Enum representing the type of the game.
+ * 
+ * @author kelecs08
+ */
 public enum GameType {
 
-	ONE_PLAYER("ONE PLAYER"), TWO_PLAYER("TWO PLAYER");
+	ONE_PLAYER("One player game"), 
+	TWO_PLAYER("Two player game");
 	
-	private String title;
+	private String typeString;
 	
-	GameType(String title) {
-		this.title = title;
+	private GameType(String typeString) {
+		this.typeString = typeString;
+	}
+
+	public String getTypeString() {
+		return typeString;
 	}
 	
-	public String getTitle() {
-		return this.title;
-	}
 }

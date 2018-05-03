@@ -1,5 +1,10 @@
 package hu.elte.thesis.model;
 
+/**
+ * Enum representing the possible colors of the players' blobs.
+ * 
+ * @author kelecs08
+ */
 public enum Blobs {
 	
 	BLUE("blue"),
@@ -15,9 +20,12 @@ public enum Blobs {
 	
 	private String blobColorString; 
 	
-	Blobs(String blobColorString) { this.blobColorString = blobColorString; }
+	Blobs(String blobColorString) {
+		this.blobColorString = blobColorString;
+	}
 	
-	public String getBlobColorString() { return blobColorString; }
-	
+	public String getBlobColorString() {
+		return blobColorString;
+	}
 	
 }

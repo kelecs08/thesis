@@ -19,40 +19,39 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import hu.elte.thesis.controller.MainController;
-import hu.elte.thesis.minimax.RootChild;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.model.Blobs;
-import hu.elte.thesis.model.Player;
-import hu.elte.thesis.view.dto.SimplePosition;
+import hu.elte.thesis.view.dto.PlayerDto;
+import hu.elte.thesis.view.dto.PositionDto;
+import hu.elte.thesis.view.dto.RootChildDto;
 import hu.elte.thesis.view.service.ImageResizingService;
 import hu.elte.thesis.view.service.PropertyService;
 
+/**
+ * The center game panel appearing in main window.
+ * 
+ * @author kelecs08
+ */
 public class GamePanel extends JPanel {
 
 	private static final long serialVersionUID = -3559703782267201891L;
 
-	private final MainController mainController;
+	private final MainControllerInterface mainController;
 	private final ImageResizingService imageResizingService;
 	private final PropertyService propertyService;
 	private final Properties iconProperties;
 
-	private ImageIcon playerOneImage;
-	private ImageIcon playerTwoImage;
-
 	private JPanel center;
-	private JPanel playerOnePanel;
-	private JPanel playerTwoPanel;
+	private JPanel playerOnePanel, playerTwoPanel;
 
-	private JLabel playerOneIconLabel;
-	private JLabel playerTwoIconLabel;
+	private ImageIcon playerOneImage, playerTwoImage;
+	private JLabel playerOneIconLabel, playerTwoIconLabel, footer;
+	private JButton playerOneNameButton, playerTwoNameButton;
+	private JButton playerOneScoreButton, playerTwoScoreButton;
+	
+	private boolean showLevels = true;
 
-	private JButton playerOneNameButton;
-	private JButton playerTwoNameButton;
-
-	private JButton playerOneScoreButton;
-	private JButton playerTwoScoreButton;
-
-	public GamePanel(MainController mainController) {
+	public GamePanel(MainControllerInterface mainController) {
 		super(new BorderLayout());
 		this.mainController = mainController;
 		this.imageResizingService = new ImageResizingService();
@@ -64,38 +63,11 @@ public class GamePanel extends JPanel {
 		this.playerTwoImage = imageResizingService.resizeImage(iconProperties.getProperty(Blobs.RED.getBlobColorString()), playerSize, playerSize, true);
 	}
 
-	public ImageIcon getPlayerOneImage() {
-		return playerOneImage;
-	}
-
-	public void setPlayerOneImage(ImageIcon playerOneImage) {
-		this.playerOneImage = playerOneImage;
-	}
-
-	public ImageIcon getPlayerTwoImage() {
-		return playerTwoImage;
-	}
-
-	public void setPlayerTwoImage(ImageIcon playerTwoImage) {
-		this.playerTwoImage = playerTwoImage;
-	}
-
-	public JLabel getPlayerOneIconLabel() {
-		return playerOneIconLabel;
-	}
-
-	public void setPlayerOneIconLabel(JLabel playerOneIconLabel) {
-		this.playerOneIconLabel = playerOneIconLabel;
-	}
-
-	public JLabel getPlayerTwoIconLabel() {
-		return playerTwoIconLabel;
-	}
-
-	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) {
-		this.playerTwoIconLabel = playerTwoIconLabel;
-	}
-
+	/**
+	 * Crates the initial table board represented by main window.
+	 * @return
+	 * 		this object
+	 */
 	public JPanel createInitialTableBoard() {
 		center = new JPanel();
 		center.setLayout(new GridLayout(this.mainController.getTableSize(), this.mainController.getTableSize()));
@@ -110,24 +82,20 @@ public class GamePanel extends JPanel {
 		playerOneIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("blue"), playerLabelSize, playerLabelSize, false));
 		playerIconLabelSettings(playerOneIconLabel);
 
-		playerOneNameButton = new JButton(mainController.getPlayerOne()
-			.getName());
+		playerOneNameButton = new JButton(mainController.getPlayerOne().getName());
 		playerOneNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerOne()
-					.getName(), JOptionPane.QUESTION_MESSAGE);
-				if (name != null && !("").equals(name) && name.length() <= 10) {
-					playerOneNameButton.setText(name);
-					mainController.getPlayerOne()
-						.setName(name);
+				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerOne().getName(), JOptionPane.QUESTION_MESSAGE);
+				if (name != null && !("").equals(name) && name.length() <= 10 && !name.trim().equals("")) {
+					playerOneNameButton.setText(name.trim());
+					mainController.getPlayerOne().setName(name.trim());
 				}
 			}
 		});
 		playerButtonSettings(playerOneNameButton);
 		setBGBlackFGWhite(playerOneNameButton);
-		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne()
-			.getReservedSpots()));
+		playerOneScoreButton = new JButton(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
 		playerButtonSettings(playerOneScoreButton);
 		setBGBlackFGWhite(playerOneScoreButton);
 
@@ -143,25 +111,21 @@ public class GamePanel extends JPanel {
 		playerTwoIconLabel = new JLabel(imageResizingService.resizeImage(iconProperties.getProperty("red"), playerLabelSize, playerLabelSize, true));
 		playerIconLabelSettings(playerTwoIconLabel);
 
-		playerTwoNameButton = new JButton(mainController.getPlayerTwo()
-			.getName());
+		playerTwoNameButton = new JButton(mainController.getPlayerTwo().getName());
 		playerTwoNameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerTwo()
-					.getName(), JOptionPane.QUESTION_MESSAGE);
-				if (name != null && !("").equals(name)) {
-					playerTwoNameButton.setText(name);
-					mainController.getPlayerTwo()
-						.setName(name);
+				String name = JOptionPane.showInputDialog(center, "New name:\n(Maximum 10 character)", "New name for " + mainController.getPlayerTwo().getName(), JOptionPane.QUESTION_MESSAGE);
+				if (name != null && !("").equals(name) && name.length() <= 10 && !name.trim().equals("")) {
+					playerTwoNameButton.setText(name.trim());
+					mainController.getPlayerTwo().setName(name.trim());
 				}
 			}
 		});
 		playerButtonSettings(playerTwoNameButton);
 		setBGWhiteFGBlack(playerTwoNameButton);
 
-		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo()
-			.getReservedSpots()));
+		playerTwoScoreButton = new JButton(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
 		playerButtonSettings(playerTwoScoreButton);
 		setBGWhiteFGBlack(playerTwoScoreButton);
 
@@ -169,10 +133,15 @@ public class GamePanel extends JPanel {
 		playerTwoPanel.add(playerTwoNameButton);
 		playerTwoPanel.add(playerTwoScoreButton);
 		playerTwoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		
+		footer = new JLabel(mainController.getGameType().getTypeString());
+		footer.setFont(new Font("Times new roman", Font.BOLD, 16));
+		footer.setBorder(BorderFactory.createEmptyBorder(0, 10, 8, 0));
 
 		add(center, BorderLayout.CENTER);
 		add(playerOnePanel, BorderLayout.LINE_START);
 		add(playerTwoPanel, BorderLayout.LINE_END);
+		add(footer, BorderLayout.SOUTH);
 		return this;
 	}
 
@@ -198,6 +167,9 @@ public class GamePanel extends JPanel {
 		playerIconLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
 	}
 
+	/**
+	 * Updates the view of the game board to match the controller.
+	 */
 	public void updateCenter() {
 		center.removeAll();
 		center.revalidate();
@@ -222,27 +194,24 @@ public class GamePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (mainController.isClickOne(i, j)) {
 					button.setBackground(Color.BLACK);
-					renderFirstLevelFields();
-					renderSecondLevelFields();
+					if(showLevels) {
+						renderFirstLevelFields();
+						renderSecondLevelFields();
+					} else {
+						mainController.getPositionsToBeRenderedFirstLevel();
+						mainController.getPositionsToBeRenderedSecondLevel();
+					}
 				} else if (mainController.isClickingTheClickedPosition(i, j)) {
 					updateFields();
 				} else if (!mainController.isClickOne(i, j)) {
 					if (mainController.step(i, j)) {
 						updateFields();
 						if (!checkWinning()) {
-							RootChild rootChild = mainController.stepWithComputer();
+							RootChildDto rootChild = mainController.stepWithComputer();
 							if (rootChild != null) {
 								updateFields();
-								renderField(rootChild.getRootPosition()
-									.getRow() - 2,
-										rootChild.getRootPosition()
-											.getColumn() - 2,
-										Color.YELLOW);
-								renderField(rootChild.getBestChildPosition()
-									.getRow() - 2,
-										rootChild.getBestChildPosition()
-											.getColumn() - 2,
-										Color.BLACK);
+								renderField(rootChild.getRoot().getRow() - 2, rootChild.getRoot().getColumn() - 2, Color.YELLOW);
+								renderField(rootChild.getChild().getRow() - 2, rootChild.getChild().getColumn() - 2, Color.BLACK);
 								checkWinning();
 							}
 						}
@@ -262,14 +231,20 @@ public class GamePanel extends JPanel {
 		renderFields(mainController.getPositionsToBeRenderedSecondLevel(), Color.GRAY);
 	}
 
-	private void renderFields(List<SimplePosition> positionsToBeRendered, Color color) {
-		for (SimplePosition sp : positionsToBeRendered) {
+	private void renderFields(List<PositionDto> positionsToBeRendered, Color color) {
+		for (PositionDto sp : positionsToBeRendered) {
 			Component component = center.getComponent(sp.getRow() * mainController.getTableSize() + sp.getColumn());
 			JButton field = (JButton) component;
 			field.setBackground(color);
 		}
 	}
 
+	/**
+	 * Renders the field background at the given position to the defined color.
+	 * @param row
+	 * @param column
+	 * @param color
+	 */
 	public void renderField(int row, int column, Color color) {
 		Component component = center.getComponent(row * mainController.getTableSize() + column);
 		JButton field = (JButton) component;
@@ -289,6 +264,9 @@ public class GamePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Updates the fields of the game board to match the controller.
+	 */
 	public void updateFields() {
 		updateActualPlayerView();
 		for (int i = 0; i < this.mainController.getTableSize(); i++) {
@@ -308,28 +286,22 @@ public class GamePanel extends JPanel {
 	}
 
 	private void updateActualPlayerView() {
-		if (this.mainController.getActualPlayer()
-			.getName()
-			.equals(playerOneNameButton.getText())) {
+		if (this.mainController.getActualPlayer().getName().equals(playerOneNameButton.getText())) {
 			setBGBlackFGWhite(playerOneNameButton);
 			setBGBlackFGWhite(playerOneScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
-				.getReservedSpots()));
+			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
 
 			setBGWhiteFGBlack(playerTwoNameButton);
 			setBGWhiteFGBlack(playerTwoScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
-				.getReservedSpots()));
+			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
 		} else {
 			setBGBlackFGWhite(playerTwoNameButton);
 			setBGBlackFGWhite(playerTwoScoreButton);
-			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne()
-				.getReservedSpots()));
+			playerOneScoreButton.setText(Integer.toString(mainController.getPlayerOne().getReservedSpots()));
 
 			setBGWhiteFGBlack(playerOneNameButton);
 			setBGWhiteFGBlack(playerOneScoreButton);
-			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo()
-				.getReservedSpots()));
+			playerTwoScoreButton.setText(Integer.toString(mainController.getPlayerTwo().getReservedSpots()));
 		}
 	}
 
@@ -339,7 +311,7 @@ public class GamePanel extends JPanel {
 			mainController.startNewGame();
 			return true;
 		}
-		Player winner = this.mainController.getWinner();
+		PlayerDto winner = this.mainController.getWinner();
 		if (winner != null) {
 			JOptionPane.showMessageDialog(this, "Game over!\nThe winner is player " + winner.getName() + " !! :D");
 			mainController.startNewGame();
@@ -352,7 +324,7 @@ public class GamePanel extends JPanel {
 				mainController.startNewGame();
 				return true;
 			} else {
-				Player winner2 = mainController.getWinnerWhenStepsAreNotAvailable();
+				PlayerDto winner2 = mainController.getWinnerWhenStepsAreNotAvailable();
 				JOptionPane.showMessageDialog(this, "Game over!\nThe game ended due to not being able to step.\nThe winner is " + winner2.getName() + " !! :D");
 				mainController.startNewGame();
 				return true;
@@ -361,11 +333,25 @@ public class GamePanel extends JPanel {
 		return false;
 	}
 
-	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) {
-		playerOneIconLabel.setIcon(blobPlayerLabel);
-	}
 
-	public void updatePlayerTwoLabel(ImageIcon blobPlayerLabel) {
-		playerTwoIconLabel.setIcon(blobPlayerLabel);
-	}
+	public ImageIcon getPlayerOneImage() { return playerOneImage; }
+	public void setPlayerOneImage(ImageIcon playerOneImage) { this.playerOneImage = playerOneImage; }
+
+	public ImageIcon getPlayerTwoImage() { return playerTwoImage; }
+	public void setPlayerTwoImage(ImageIcon playerTwoImage) { this.playerTwoImage = playerTwoImage; }
+
+	public JLabel getPlayerOneIconLabel() {	return playerOneIconLabel; }
+	public void setPlayerOneIconLabel(JLabel playerOneIconLabel) { this.playerOneIconLabel = playerOneIconLabel; }
+	public void updatePlayerOneLabel(ImageIcon blobPlayerLabel) { playerOneIconLabel.setIcon(blobPlayerLabel); }
+
+	public JLabel getPlayerTwoIconLabel() {	return playerTwoIconLabel; }
+	public void setPlayerTwoIconLabel(JLabel playerTwoIconLabel) { this.playerTwoIconLabel = playerTwoIconLabel; }
+	public void updatePlayerTwoLabel(ImageIcon blobPlayerLabel) { playerTwoIconLabel.setIcon(blobPlayerLabel); }
+	
+	public JLabel getFooter() {	return footer; }
+	
+	public boolean isShowLevels() { return this.showLevels; }
+	public void setShowLevels(boolean showLevels) { this.showLevels = showLevels; }
+
+	public void setPlayerTwoNameButtonText(String name) { this.playerTwoNameButton.setText(name); }
 }

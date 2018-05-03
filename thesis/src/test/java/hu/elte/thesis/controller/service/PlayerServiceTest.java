@@ -1,4 +1,4 @@
-package hu.elte.thesis.controller;
+package hu.elte.thesis.controller.service;
 
 import static org.junit.Assert.*;
 

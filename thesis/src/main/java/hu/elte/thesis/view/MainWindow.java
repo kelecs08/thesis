@@ -17,15 +17,20 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.view.service.PropertyService;
 
+/**
+ * The main window of the application.
+ * 
+ * @author kelecs08
+ */
 public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = -9104376452678470583L;
 	
 	private PropertyService propertyService;
-	private MainController mainController;
+	private MainControllerInterface mainController;
 
 	private CustomMenuBar customMenuBar;
 	private GamePanel gamePanel;
@@ -38,21 +43,72 @@ public class MainWindow extends JFrame {
 		setWindowButtonActions();
 	}
 
+	/**
+	 * Creates the menubar for the main window.
+	 */
 	public void createCustomMenuBar() {
 		customMenuBar = new CustomMenuBar(mainController);
 		JMenuBar menuBar = customMenuBar.getCustomMenuBar();
 		setJMenuBar(menuBar);
 	}
 
+	/**
+	 * Creates the default table board for the main window.
+	 */
 	public void createDefaultTableBoard() {
 		this.gamePanel = new GamePanel(mainController);
 		add(this.gamePanel.createInitialTableBoard());
 		pack();
 	}
 	
-	public void setMainController(MainController mainController) { this.mainController = mainController; }
+	/**
+	 * Sets formatting changes for the main window depending on the game size.
+	 * @param size
+	 * 		the size of the table board
+	 */
+	public void setFrameSettings(String size) {
+		Properties mainWindowSettingProperties = propertyService.loadMainWindowSettingProperties(size);
+		int preferredWindowSizeX = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeX"));
+		int preferredWindowSizeY = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeY"));
+		setPreferredSize(new Dimension(preferredWindowSizeX, preferredWindowSizeY));
+		pack();
+		setLocationRelativeTo(null);
+	}
+	
+	/**
+	 * Shows a confirmation dialog before terminating the program.
+	 */
+	public void showExitConfirmation() {
+		int n = JOptionPane.showConfirmDialog(this, "Are you sure, you want to exit?", "Confirmation", JOptionPane.YES_NO_OPTION);
+		if(n == JOptionPane.YES_OPTION)	doUponExit();
+	}
 
-	public GamePanel getGamePanel() { return gamePanel; }	
+	private void doUponExit() { this.dispose(); }
+
+	/**
+	 * Loads the nimbus look and feel for the main window.
+	 */
+	public void loadNimbusLookAndFeel() {
+		try {
+			for(LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
+				if("Nimbus".equals(lookAndFeelInfo.getName())) {
+					UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
+					break;
+				}
+			}
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e1) {	System.out.println("Nimbus look and feel failed to be loaded."); }
+	}
+	
+	/**
+	 * Loads the metal look and feel for the main window.
+	 */
+	public void loadMetalLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) { e.printStackTrace(); }
+	}
 	
 	private void setWindowButtonActions() {
 		setResizable(false);
@@ -70,8 +126,7 @@ public class MainWindow extends JFrame {
 		Properties mainWindowSettingProperties = propertyService.loadMainWindowSettingProperties("small");
 		setTitle(mainWindowSettingProperties.getProperty("title"));
 
-		ClassLoader classLoader = Thread.currentThread()
-			.getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		try (InputStream inputStream = classLoader.getResourceAsStream(mainWindowSettingProperties.getProperty("image"))) {
 			BufferedImage image;
 			image = ImageIO.read(inputStream);
@@ -86,38 +141,6 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 	
-	public void setFrameSettings(String size) {
-		Properties mainWindowSettingProperties = propertyService.loadMainWindowSettingProperties(size);
-		int preferredWindowSizeX = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeX"));
-		int preferredWindowSizeY = Integer.parseInt(mainWindowSettingProperties.getProperty("preferredWindowSizeY"));
-		setPreferredSize(new Dimension(preferredWindowSizeX, preferredWindowSizeY));
-		pack();
-		setLocationRelativeTo(null);
-	}
-	
-	public void showExitConfirmation() {
-		int n = JOptionPane.showConfirmDialog(this, "Are you sure, you want to exit?", "Confirmation", JOptionPane.YES_NO_OPTION);
-		if(n == JOptionPane.YES_OPTION)	doUponExit();
-	}
-
-	private void doUponExit() { this.dispose(); }
-
-	public void loadNimbusLookAndFeel() {
-		try {
-			for(LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
-				if("Nimbus".equals(lookAndFeelInfo.getName())) {
-					UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
-					break;
-				}
-			}
-			SwingUtilities.updateComponentTreeUI(this);
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e1) {	System.out.println("Nimbus look and feel failed to be loaded."); }
-	}
-	
-	public void loadMetalLookAndFeel() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			SwingUtilities.updateComponentTreeUI(this);
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) { e.printStackTrace(); }
-	}
+	public void setMainController(MainControllerInterface mainController) { this.mainController = mainController; }
+	public GamePanel getGamePanel() { return gamePanel; }	
 }

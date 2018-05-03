@@ -1,17 +1,20 @@
 package hu.elte.thesis;
 
 import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.view.MainWindow;
 
 /**
- * Entry point of the application
+ * Entry point of the application.
+ * 
+ * @author kelecs08
  */
 public class App {
 
     public static void main( String[] args ) {
 
     	MainWindow mainWindow = new MainWindow();
-    	MainController mainController = new MainController();
+    	MainControllerInterface mainController = new MainController();
     	
     	mainWindow.setMainController(mainController);
     	mainController.setMainWindow(mainWindow);
@@ -20,6 +23,5 @@ public class App {
     	
     	mainWindow.createDefaultTableBoard();
     	mainController.fillDefaultTableBoard();
-
     }
 }

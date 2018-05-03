@@ -1,16 +1,18 @@
 package hu.elte.thesis.model;
 
-import java.io.Serializable;
-
-public class Position implements Serializable {
-
-	private static final long serialVersionUID = -4126487606928388791L;
+/**
+ * Model class representing a field of the table board.
+ * 
+ * @author kelecs08
+ */
+public class Position {
 
 	private int row;
 	private int column;
 	private Player player;
 	private boolean validSpace;
 	
+	public Position() {}
 	
 	public Position(int row, int column, Player player, boolean valiSpace) {
 		this.row = row;
@@ -41,10 +43,6 @@ public class Position implements Serializable {
 
 	public void setValidSpace(boolean validSpace) {
 		this.validSpace = validSpace;
-	}
-	
-	public int getCoordinatesAdditionedValue() {
-		return this.row + this.column;
 	}
 	
 	@Override
@@ -79,12 +77,6 @@ public class Position implements Serializable {
 		if (validSpace != other.validSpace)
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Position [row=" + row + ", column=" + column + ", player=" + player + ", validSpace=" + validSpace
-				+ "]";
 	}
 	
 }

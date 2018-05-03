@@ -3,25 +3,27 @@ package hu.elte.thesis.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.elte.thesis.controller.algorithm.MinimaxAlgorithm;
+import hu.elte.thesis.controller.algorithm.RandomAlgorithm;
 import hu.elte.thesis.controller.service.PlayerService;
 import hu.elte.thesis.controller.service.TableBoardService;
-import hu.elte.thesis.minimax.MinimaxAlgorithm;
-import hu.elte.thesis.minimax.RootChild;
 import hu.elte.thesis.model.ComputerPlayerDifficulty;
 import hu.elte.thesis.model.GameType;
 import hu.elte.thesis.model.Player;
 import hu.elte.thesis.model.Position;
-import hu.elte.thesis.random.RandomAlgorithm;
+import hu.elte.thesis.model.RootChild;
+import hu.elte.thesis.model.transformer.ModelTransformer;
 import hu.elte.thesis.view.MainWindow;
-import hu.elte.thesis.view.dto.SimplePosition;
+import hu.elte.thesis.view.dto.PlayerDto;
+import hu.elte.thesis.view.dto.PositionDto;
+import hu.elte.thesis.view.dto.RootChildDto;
 
 /**
- * The controller of the application.
+ * The implementation of the controller of the application.
+ * 
+ * @author kelecs08
  */
-public class MainController {
-
-	public static final int ADDITIONAL_FIELDS = 4;
-	public static final int INITIAL_TABLE_SIZE = 4;
+public class MainController implements MainControllerInterface {
 
 	private MainWindow mainWindow;
 
@@ -42,6 +44,7 @@ public class MainController {
 	private final RandomAlgorithm randomAlgorithm = new RandomAlgorithm();
 	private final TableBoardService tableBoardService = new TableBoardService();
 	private final PlayerService playerService = new PlayerService();
+	private final ModelTransformer modelTransformer = new ModelTransformer();
 
 	/**
 	 * Constructor for the MainController class.
@@ -64,76 +67,72 @@ public class MainController {
 	private void initializePlayers(boolean isComputerPlayer) {
 		this.playerOne = new Player("Player1", false);
 		this.playerTwo = new Player("Player2", false);
-		this.playerService.setComputerPlayer(playerTwo, isComputerPlayer);
 	}
 
 	private void initializeActualPlayer() {
 		this.actualPlayer = this.playerOne;
 	}
 
+	@Override
 	public void startNewGame() {
 		startNewGame(playerTwo.isComputerPlayer());
 	}
 
+	@Override
 	public void startNewGame(boolean isComputerPlayer) {
 		initializeTableBoard(this.tableSize);
 
 		this.playerService.updatePlayers(playerOne, playerTwo, isComputerPlayer);
+		updateGameTypeLabel();
 		initializeActualPlayer();
 		this.clickedPosition = null;
 
 		fillDefaultTableBoard();
-		this.mainWindow.getGamePanel()
-			.updateFields();
+		this.mainWindow.getGamePanel().updateFields();
 	}
 
+	@Override
+	public void updateGameTypeLabel() {
+		mainWindow.getGamePanel().getFooter().setText((gameType.equals(GameType.TWO_PLAYER)) ? gameType.getTypeString() : gameType.getTypeString() + ": " + computerPlayerDifficulty.getDifficultyString());
+	}
+
+	@Override
 	public void changeTableSize(int tableSize) {
 		initializeTableBoard(tableSize);
 		this.playerService.updatePlayers(playerOne, playerTwo, playerTwo.isComputerPlayer());
 		fillDefaultTableBoard();
 	}
+	
+	@Override
+	public void changeTableSize(int tablesize, Position[][] tableBoardPositions) {
+		this.tableSize = tablesize;
+		this.tableBoardPositions = tableBoardPositions;
+		this.clickedPosition = null;
+		this.firstLevel = new ArrayList<>();
+		this.secondLevel = new ArrayList<>();
+	}
 
+	@Override
 	public void fillDefaultTableBoard() {
 		tableBoardService.fillDefaultTableBoard(tableSize, tableBoardPositions, playerOne, playerTwo);
 	}
 
-	public boolean isPlayerOneField(int row, int column) {
-		Player player = getPlayerAtGivenPosition(row, column);
-		if (player == null) {
-			return false;
-		} else {
-			return player.equals(playerOne);
-		}
-	}
-
-	public boolean isPlayerTwoField(int row, int column) {
-		Player player = getPlayerAtGivenPosition(row, column);
-		if (player == null) {
-			return false;
-		} else {
-			return player.equals(playerTwo);
-		}
-	}
-
-	private Player getPlayerAtGivenPosition(int row, int column) {
-		return this.tableBoardPositions[row + 2][column + 2].getPlayer();
-	}
-
+	@Override
 	public boolean isClickOne(int row, int column) {
 		if (this.clickedPosition != null) {
-			return false; // someone already clicked before
+			return false; 												// someone already clicked before
 		}
-		Position position = this.tableBoardPositions[row][column]; // the clicked position
-		Player player = position.getPlayer(); // the player in the clicked position --> player1, player2, null !!
-		if (player != null && player.equals(actualPlayer) && !actualPlayer.isComputerPlayer()
-				&& tableBoardService.checkStepAvailable(position, tableBoardPositions)) {
+		Position position = this.tableBoardPositions[row][column]; 		// the clicked position
+		Player player = position.getPlayer(); 							// the player in the clicked position --> player1, player2, null !!
+		if (player != null && player.equals(actualPlayer) && !actualPlayer.isComputerPlayer() && tableBoardService.checkStepAvailable(position, tableBoardPositions)) {
 			this.clickedPosition = position;
 		}
 		return this.clickedPosition != null;
 	}
 
-	public List<SimplePosition> getPositionsToBeRenderedFirstLevel() { // because of not valid fields the array size differs according to clicked position
-		List<SimplePosition> positionsToBeRenderedFirstLevel = new ArrayList<>();
+	@Override
+	public List<PositionDto> getPositionsToBeRenderedFirstLevel() { // because of not valid fields the array size differs according to clicked position
+		List<PositionDto> positionsToBeRenderedFirstLevel = new ArrayList<>();
 		int row = this.clickedPosition.getRow();
 		int column = this.clickedPosition.getColumn();
 		for (int i = row - 1; i <= row + 1; i++) {
@@ -141,15 +140,16 @@ public class MainController {
 				Position position = this.tableBoardPositions[i][j];
 				if (position.isValidSpace() && position != this.clickedPosition && position.getPlayer() == null) {
 					firstLevel.add(position);
-					positionsToBeRenderedFirstLevel.add(new SimplePosition(i - 2, j - 2));
+					positionsToBeRenderedFirstLevel.add(modelTransformer.transformPositionToPositionDto(tableBoardPositions[i - 2][j - 2]));
 				}
 			}
 		}
 		return positionsToBeRenderedFirstLevel;
 	}
 
-	public List<SimplePosition> getPositionsToBeRenderedSecondLevel() {
-		List<SimplePosition> positionsToBeRenderedSecondLevel = new ArrayList<>();
+	@Override
+	public List<PositionDto> getPositionsToBeRenderedSecondLevel() {
+		List<PositionDto> positionsToBeRenderedSecondLevel = new ArrayList<>();
 		int row = this.clickedPosition.getRow();
 		int column = this.clickedPosition.getColumn();
 		for (int i = row - 2; i <= row + 2; i++) {
@@ -157,20 +157,17 @@ public class MainController {
 				Position position = this.tableBoardPositions[i][j];
 				if (position.isValidSpace() && position != this.clickedPosition && position.getPlayer() == null) {
 					secondLevel.add(position);
-					positionsToBeRenderedSecondLevel.add(new SimplePosition(i - 2, j - 2));
+					positionsToBeRenderedSecondLevel.add(modelTransformer.transformPositionToPositionDto(tableBoardPositions[i - 2][j - 2]));
 				}
 			}
 		}
-		List<SimplePosition> positionsToBeRenderedFirstLevel = getPositionsToBeRenderedFirstLevel();
+		List<PositionDto> positionsToBeRenderedFirstLevel = getPositionsToBeRenderedFirstLevel();
 		secondLevel.removeAll(firstLevel);
 		positionsToBeRenderedSecondLevel.removeAll(positionsToBeRenderedFirstLevel);
 		return positionsToBeRenderedSecondLevel;
 	}
 
-	public boolean isClickedPosition(int row, int column) {
-		return (this.clickedPosition != null && this.clickedPosition.getRow() == row && this.clickedPosition.getColumn() == column);
-	}
-
+	@Override
 	public boolean isClickingTheClickedPosition(int row, int column) {
 		if (isClickedPosition(row, column)) {
 			this.clickedPosition = null;
@@ -181,6 +178,11 @@ public class MainController {
 		return false;
 	}
 
+	private boolean isClickedPosition(int row, int column) {
+		return (this.clickedPosition != null && this.clickedPosition.getRow() == row && this.clickedPosition.getColumn() == column);
+	}
+
+	@Override
 	public boolean step(int row, int column) {
 		Position position = cleavage(row, column); // osztódás
 		if (position != null) {
@@ -225,7 +227,7 @@ public class MainController {
 		clickedPosition = null;
 	}
 
-	public Position cleavage(int row, int column) {
+	private Position cleavage(int row, int column) {
 		for (int i = 0; i < firstLevel.size(); i++) {
 			Position position = firstLevel.get(i);
 			if (position.getRow() == row && position.getColumn() == column) {
@@ -235,7 +237,7 @@ public class MainController {
 		return null;
 	}
 
-	public Position jump(int row, int column) {
+	private Position jump(int row, int column) {
 		for (int i = 0; i < secondLevel.size(); i++) {
 			Position position = secondLevel.get(i);
 			if (position.getRow() == row && position.getColumn() == column) {
@@ -253,14 +255,17 @@ public class MainController {
 		}
 	}
 
+	@Override
 	public boolean isDrawWhenStepsAreNotAvailable() {
 		return playerService.isDrawWhenStepsAreNotAvailable(playerOne, playerTwo);
 	}
 
-	public Player getWinnerWhenStepsAreNotAvailable() {
-		return playerService.getWinnerWhenStepsAreNotAvailable(playerOne, playerTwo);
+	@Override
+	public PlayerDto getWinnerWhenStepsAreNotAvailable() {
+		return modelTransformer.transformPlayerToPlayerDto(playerService.getWinnerWhenStepsAreNotAvailable(playerOne, playerTwo));
 	}
 
+	@Override
 	public boolean areStepsAvailable() {
 		List<Position> positions = new ArrayList<>();
 		for (int i = 2; i < tableSize + 2; i++) {
@@ -271,122 +276,91 @@ public class MainController {
 				}
 			}
 		}
-		System.out.println(positions.size());
 		return this.tableBoardService.checkStepsAvailableForAllPlayerField(positions, tableBoardPositions);
 	}
 
-	public RootChild stepWithComputer() {
+	@Override
+	public RootChildDto stepWithComputer() {
 		if (playerTwo.isComputerPlayer()) {
-			List<Position> rootPositions = new ArrayList<>();
-			for (int i = 2; i < tableSize + 2; i++) {
-				for (int j = 2; j < tableSize + 2; j++) {
-					Player tmp = tableBoardPositions[i][j].getPlayer();
-					if (tmp != null && tmp.isComputerPlayer()) {
-						rootPositions.add(tableBoardPositions[i][j]);
-					}
-				}
-			}
 			RootChild rootChild = null;
 			if (this.computerPlayerDifficulty == ComputerPlayerDifficulty.EASY) {
-				rootChild = randomAlgorithm.getRandomRootChild(rootPositions, tableBoardPositions);
+				rootChild = randomAlgorithm.getRandomRootChild(tableBoardPositions, playerTwo);
+			} else if(this.computerPlayerDifficulty == ComputerPlayerDifficulty.MEDIUM) {
+				rootChild = minimaxAlgorithm.getStepUsingMinimax(tableBoardPositions, playerOne, playerTwo, 3, 3);
 			} else {
-				rootChild = minimaxAlgorithm.getRootAndPositionToBeStepped(rootPositions, 1, tableBoardPositions);
+				rootChild = minimaxAlgorithm.getBestStepAtEachRound(tableBoardPositions, playerTwo);
 			}
 			Position rootPosition = rootChild.getRootPosition();
 			Position positionToStep = rootChild.getBestChildPosition();
 			if (positionToStep != null) {
-				positionToStep.setPlayer(playerTwo);
-				int score = rootChild.getBestScore();
-				if (score % 10 == 1) {
+				if (tableBoardService.isFirstLevelPositionOfTheGivenPosition(tableBoardPositions, rootPosition, positionToStep)) {
 					playerTwo.modifyReservedSpotsNumber(1);
-				} else if (score % 10 == 0) {
+				} else if (tableBoardService.isSecondLevelPositionOfTheGivenPosition(tableBoardPositions, rootPosition, positionToStep)) {
 					tableBoardPositions[rootPosition.getRow()][rootPosition.getColumn()].setPlayer(null);
 				}
+				positionToStep.setPlayer(playerTwo);
 				overtakeFields(positionToStep, playerTwo);
 				updateDataFields();
-				return rootChild;
+				return modelTransformer.transformRootChildToRootChildDto(rootChild);
 			}
 		}
 		return null;
 	}
 
-	public Player getOtherPlayer(Player player) {
+	private Player getOtherPlayer(Player player) {
 		if (player.equals(playerOne)) {
 			return playerTwo;
 		}
 		return playerOne;
 	}
-
-	public Player getWinner() {
-		return playerService.getWinner(tableSize * tableSize, playerOne, playerTwo);
+	
+	@Override
+	public boolean isPlayerOneField(int row, int column) {
+		return playerService.isPlayerOneField(tableBoardPositions, playerOne, row, column);
+	}
+	
+	@Override
+	public boolean isPlayerTwoField(int row, int column) {
+		return playerService.isPlayerTwoField(tableBoardPositions, playerTwo, row, column);
 	}
 
+	@Override
+	public PlayerDto getWinner() {
+		return modelTransformer.transformPlayerToPlayerDto(playerService.getWinner(tableSize * tableSize, playerOne, playerTwo));
+	}
+
+	@Override
 	public boolean isDraw() {
 		return playerService.isDraw(tableSize * tableSize, playerOne, playerTwo);
 	}
-
-	public MainWindow getMainWindow() {
-		return this.mainWindow;
+	
+	@Override
+	public void setPlayerTwoName(String name) { 
+		this.playerTwo.setName(name);
+		mainWindow.getGamePanel().setPlayerTwoNameButtonText(name);
 	}
 
-	public void setMainWindow(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-	}
+	public MainWindow getMainWindow() { return this.mainWindow; }
+	public void setMainWindow(MainWindow mainWindow) { this.mainWindow = mainWindow; }
 
-	public GameType getGameType() {
-		return this.gameType;
-	}
+	public GameType getGameType() {	return this.gameType; }
+	public void setGameType(GameType gameType) { this.gameType = gameType; }
 
-	public void setGameType(GameType gameType) {
-		this.gameType = gameType;
-	}
+	public ComputerPlayerDifficulty getComputerPlayerDifficulty() { return this.computerPlayerDifficulty; }
+	public void setComputerPlayerDifficulty(ComputerPlayerDifficulty computerPlayerDifficulty) { this.computerPlayerDifficulty = computerPlayerDifficulty; }
 
-	public ComputerPlayerDifficulty getComputerPlayerDifficulty() {
-		return this.computerPlayerDifficulty;
-	}
+	public Position[][] getTableBoardPositions() { return this.tableBoardPositions; }
 
-	public void setComputerPlayerDifficulty(ComputerPlayerDifficulty computerPlayerDifficulty) {
-		this.computerPlayerDifficulty = computerPlayerDifficulty;
-	}
+	public int getTableSize() {	return this.tableSize; }
+	public void setTableSize(int tableSize) { this.tableSize = tableSize; }
 
-	public Position[][] getTableBoardPositions() {
-		return this.tableBoardPositions;
-	}
+	public Player getActualPlayer() { return this.actualPlayer; }
+	public void setActualPlayer(Player actualPlayer) { this.actualPlayer = actualPlayer; }
 
-	public void setTableBoardPositions(Position[][] tableBoardPositions2) {
-		this.tableBoardPositions = tableBoardPositions;
-	}
+	public Player getPlayerOne() { return playerOne; }
+	public void setPlayerOne(Player playerOne) { this.playerOne = playerOne; }
 
-	public int getTableSize() {
-		return this.tableSize;
-	}
-
-	public void setTableSize(int tableSize) {
-		this.tableSize = tableSize;
-	}
-
-	public Player getActualPlayer() {
-		return this.actualPlayer;
-	}
-
-	public void setActualPlayer(Player actualPlayer) {
-		this.actualPlayer = actualPlayer;
-	}
-
-	public Player getPlayerOne() {
-		return playerOne;
-	}
-
-	public void setPlayerOne(Player playerOne) {
-		this.playerOne = playerOne;
-	}
-
-	public Player getPlayerTwo() {
-		return playerTwo;
-	}
-
-	public void setPlayerTwo(Player playerTwo) {
-		this.playerTwo = playerTwo;
-	}
+	public Player getPlayerTwo() { return playerTwo; }
+	public void setPlayerTwo(Player playerTwo) { this.playerTwo = playerTwo; }
 
 }

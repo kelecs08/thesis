@@ -8,38 +8,71 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.model.Blobs;
 import hu.elte.thesis.view.GamePanel;
 import hu.elte.thesis.view.service.ImageResizingService;
 import hu.elte.thesis.view.service.PropertyService;
 
+/**
+ * The implementation of the Settings menu.
+ * 
+ * @author kelecs08
+ */
 public class SettingsMenu extends JMenu {
 
 	private static final long serialVersionUID = -1539287248291630075L;
 	
-	private MainController mainController;
+	private MainControllerInterface mainController;
 	private ImageResizingService imageResizingService;
 	private PropertyService propertyService;
 	private Properties iconProperties;
 	
-	public SettingsMenu(MainController mainController) {
+	public SettingsMenu(MainControllerInterface mainController) {
 		super("Settings");
 		this.mainController = mainController;
 		this.imageResizingService = new ImageResizingService();
 		this.propertyService = new PropertyService();
-		iconProperties = propertyService.loadIconProperties();
+		this.iconProperties = this.propertyService.loadIconProperties();
 	}
 	
+	/**
+	 * Get the initialized Settings menu.
+	 * @return
+	 * 		this object
+	 */
 	public SettingsMenu getSettingsMenu() {
-		addTableSizeChangerMenuItem();
 		addImageChangerMenuItem();
-		
+		addDificultyChanger();
+		addTableSizeChangerMenuItem();
 		return this;
 	}
 
+	private void addDificultyChanger() {
+		JMenu changeDificculty = new JMenu("Difficulty...");
+		JMenuItem showLevels = new JMenuItem("Disable the appearance of levels for human players");
+		showLevels.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				boolean tmp = mainController.getMainWindow().getGamePanel().isShowLevels();
+				if (tmp) {
+					mainController.getMainWindow().getGamePanel().setShowLevels(false);
+				} else {
+					mainController.getMainWindow().getGamePanel().setShowLevels(true);
+				}
+				updateShowLevelsMenuItem(showLevels, tmp);
+			}
+		});
+		changeDificculty.add(showLevels);
+		add(changeDificculty);
+	}
+
+	private void updateShowLevelsMenuItem(JMenuItem showLevels, boolean tmp) {
+		showLevels.setText(!tmp ? "Disable the appearance of levels for human players" : "Enable the appearance of levels for human players");
+	}
+
 	private void addTableSizeChangerMenuItem() {
-		JMenu changeTableSize = new JMenu("Change table size...");
+		JMenu changeTableSize = new JMenu("Table size...");
 		
 		JMenuItem small = new JMenuItem("4 x 4 - small");
 		small.addActionListener(getTableSizeChangerActionListener(4, "small"));
@@ -70,7 +103,7 @@ public class SettingsMenu extends JMenu {
 	}
 
 	private void addImageChangerMenuItem() {
-		JMenu appearance = new JMenu("Appearance");
+		JMenu appearance = new JMenu("Appearance...");
 		
 		JMenu playerOneBlobAppearance =  new JMenu("Change Player1 blob to...");
 		JMenu playerTwoBlobAppearance =  new JMenu("Change Player2 blob to...");

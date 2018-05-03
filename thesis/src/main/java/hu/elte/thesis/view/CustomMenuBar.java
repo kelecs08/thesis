@@ -1,32 +1,33 @@
 package hu.elte.thesis.view;
 
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 
-import hu.elte.thesis.controller.MainController;
+import hu.elte.thesis.controller.MainControllerInterface;
 import hu.elte.thesis.view.menu.GameMenu;
 import hu.elte.thesis.view.menu.HelpMenu;
 import hu.elte.thesis.view.menu.SettingsMenu;
-import hu.elte.thesis.view.service.ImageResizingService;
 
+/**
+ * The menubar that the main window contains.
+ * 
+ * @author kelecs08
+ */
 public class CustomMenuBar extends JMenuBar {
 
 	private static final long serialVersionUID = 1693411529145056061L;
 
-	private MainController mainController;
+	private MainControllerInterface mainController;
 		
-	public CustomMenuBar(MainController mainController) {
+	public CustomMenuBar(MainControllerInterface mainController) {
 		super();
 		this.mainController = mainController;
 	}
 	
+	/**
+	 * Crates the initialized menubar for main window.
+	 * @return
+	 * 		this object
+	 */
 	public CustomMenuBar getCustomMenuBar() {		
 		GameMenu fileMenu = new GameMenu(mainController);
 		add(fileMenu.getFileMenu());
@@ -39,8 +40,5 @@ public class CustomMenuBar extends JMenuBar {
 		
 		return this;
 	}
-
-
-
 
 }

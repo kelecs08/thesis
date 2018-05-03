@@ -1,7 +1,6 @@
 package hu.elte.thesis.view.service;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +8,29 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+/**
+ * Service class for resizing images for view layer.
+ * 
+ * @author kelecs08
+ */
 public class ImageResizingService {
 
 	private static final int ICON_WIDTH = 20;
 	private static final int ICON_HEIGHT = 20;
 	
+	/**
+	 * Resize image.
+	 * @param imagePath
+	 * 		the path of the image which will be resized
+	 * @param width
+	 * 		the width of the wanted image
+	 * @param height
+	 * 		the height of the wanted image
+	 * @param flip
+	 * 		tells whether the image should be reflected or not
+	 * @return
+	 * 		the resized image
+	 */
 	public ImageIcon resizeImage(String imagePath, int width, int height, boolean flip) {
 		BufferedImage originalImage;
 		BufferedImage resizedImage = null;
@@ -28,12 +45,19 @@ public class ImageResizingService {
 			else
 				graphics.drawImage(originalImage, 0, 0, width, height, null);
 			graphics.dispose();
-		} catch (IOException e) {
-			System.out.println("IOException occured during the load of the icon image.");
-		}
+		} catch (IOException e) { System.out.println("IOException occured during the load of the icon image."); }
 		return new ImageIcon(resizedImage);
 	}
 	
+	/**
+	 * Resize image.
+	 * @param imagePath
+	 * 		the path of the image which will be resized
+	 * @param flip
+	 * 		tells whether the image should be reflected or not
+	 * @return
+	 * 		the resized image
+	 */
 	public ImageIcon resizeImage(String imagePath, boolean flip) {
 		return resizeImage(imagePath, ICON_WIDTH, ICON_HEIGHT, flip);
 	}

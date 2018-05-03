@@ -1,11 +1,20 @@
 package hu.elte.thesis.view.dto;
 
-public class SimplePosition {
+import hu.elte.thesis.model.Position;
+
+/**
+ * Data transfer object for {@link Position}.
+ * 
+ * @author kelecs08
+ */
+public class PositionDto {
 
 	private int row;
 	private int column;
 	
-	public SimplePosition(int row, int column) {
+	public PositionDto() {}
+	
+	public PositionDto(int row, int column) {
 		this.row = row;
 		this.column = column;
 	}
@@ -43,17 +52,12 @@ public class SimplePosition {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SimplePosition other = (SimplePosition) obj;
+		PositionDto other = (PositionDto) obj;
 		if (column != other.column)
 			return false;
 		if (row != other.row)
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "SimplePosition [row=" + row + ", column=" + column + "]";
 	}
 	
 }
