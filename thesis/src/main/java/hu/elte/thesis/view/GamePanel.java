@@ -64,7 +64,7 @@ public class GamePanel extends JPanel {
 	}
 
 	/**
-	 * Crates the initial table board represented by main window.
+	 * Creates the initial table board represented by main window.
 	 * @return
 	 * 		this object
 	 */

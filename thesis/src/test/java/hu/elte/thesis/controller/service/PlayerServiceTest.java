@@ -9,7 +9,7 @@ import hu.elte.thesis.model.Player;
 
 public class PlayerServiceTest {
 
-	private final PlayerService underTest = new PlayerService();
+	private PlayerService underTest = new PlayerService();
 
 	@Test
 	public void getWinnerWhenWinnerIsPlayerOne() {
@@ -67,7 +67,7 @@ public class PlayerServiceTest {
 	}
 
 	@Test
-	public void getWinnerWhenStepsAreAvailable() {
+	public void getWinnerWhenStepsAreNotAvailable() {
 		// GIVEN
 		Player playerOne = getPlayer(8);
 		Player playerTwo = getPlayer(6);
@@ -86,6 +86,29 @@ public class PlayerServiceTest {
 		boolean isDraw = underTest.isDraw(10, playerOne, playerTwo);
 		// THEN
 		assertTrue(isDraw);
+	}
+	
+	@Test
+	public void updatePlayers() {
+		// GIVEN
+		Player playerOne = getPlayer(6);
+		Player playerTwo = getPlayer(6);
+		// WHEN
+		underTest.updatePlayers(playerOne, playerTwo, true);
+		//THEN
+		assertEquals(2, playerOne.getReservedSpots());
+		assertEquals(2, playerTwo.getReservedSpots());
+		assertTrue(playerTwo.isComputerPlayer());
+	}
+	
+	@Test
+	public void isPlayerOneFieldReturnsTrue() {
+		// GIVEN
+		
+		// WHEN
+		
+		//THEN
+		
 	}
 
 	private Player getPlayer(int reservedSpots) {

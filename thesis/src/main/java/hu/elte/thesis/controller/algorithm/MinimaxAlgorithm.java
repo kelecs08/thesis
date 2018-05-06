@@ -67,12 +67,12 @@ public class MinimaxAlgorithm {
 		return tree;
 	}
 
-	private int getSecondLevelScoreAndSetPossibleSecondLevelChildren(Player player, Node rootNode, int bestScore) {
-		List<Position> possibleChildrenSecondLevel = tableBoardService.getSecondLevel(rootNode.getPosition(), copy);
-		for (int i = 0; i < possibleChildrenSecondLevel.size(); i++) {
-			if (possibleChildrenSecondLevel.get(i).getPlayer() == null) {
-				int countOfPossibleOvertakes = evaluationFunction(possibleChildrenSecondLevel.get(i), 0, player, true);
-				Node childNode = new Node(possibleChildrenSecondLevel.get(i), !player.isComputerPlayer());
+	private int getFirstLevelScoreAndSetPossibleFirstLevelChildren(Player player, Node rootNode, int bestScore) {
+		List<Position> possibleChildrenFirstLevel = tableBoardService.getFirstLevel(rootNode.getPosition(), copy);
+		for (int i = 0; i < possibleChildrenFirstLevel.size(); i++) {
+			if (possibleChildrenFirstLevel.get(i).getPlayer() == null) {
+				int countOfPossibleOvertakes = evaluationFunction(possibleChildrenFirstLevel.get(i), 1, player, true);
+				Node childNode = new Node(possibleChildrenFirstLevel.get(i), !player.isComputerPlayer());
 				childNode.setScore(countOfPossibleOvertakes);
 				rootNode.addChildNode(childNode);
 				if (bestScore < countOfPossibleOvertakes) {
@@ -83,12 +83,12 @@ public class MinimaxAlgorithm {
 		return bestScore;
 	}
 
-	private int getFirstLevelScoreAndSetPossibleFirstLevelChildren(Player player, Node rootNode, int bestScore) {
-		List<Position> possibleChildrenFirstLevel = tableBoardService.getFirstLevel(rootNode.getPosition(), copy);
-		for (int i = 0; i < possibleChildrenFirstLevel.size(); i++) {
-			if (possibleChildrenFirstLevel.get(i).getPlayer() == null) {
-				int countOfPossibleOvertakes = evaluationFunction(possibleChildrenFirstLevel.get(i), 1, player, true);
-				Node childNode = new Node(possibleChildrenFirstLevel.get(i), !player.isComputerPlayer());
+	private int getSecondLevelScoreAndSetPossibleSecondLevelChildren(Player player, Node rootNode, int bestScore) {
+		List<Position> possibleChildrenSecondLevel = tableBoardService.getSecondLevel(rootNode.getPosition(), copy);
+		for (int i = 0; i < possibleChildrenSecondLevel.size(); i++) {
+			if (possibleChildrenSecondLevel.get(i).getPlayer() == null) {
+				int countOfPossibleOvertakes = evaluationFunction(possibleChildrenSecondLevel.get(i), 0, player, true);
+				Node childNode = new Node(possibleChildrenSecondLevel.get(i), !player.isComputerPlayer());
 				childNode.setScore(countOfPossibleOvertakes);
 				rootNode.addChildNode(childNode);
 				if (bestScore < countOfPossibleOvertakes) {

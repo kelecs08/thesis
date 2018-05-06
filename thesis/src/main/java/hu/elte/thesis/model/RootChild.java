@@ -41,9 +41,4 @@ public class RootChild {
 		this.bestScore = bestScore;
 	}
 
-	@Override
-	public String toString() {
-		return "RootChild [rootPosition=" + rootPosition + ", bestChildPosition=" + bestChildPosition + ", bestScore=" + bestScore + "]";
-	}
-
 }

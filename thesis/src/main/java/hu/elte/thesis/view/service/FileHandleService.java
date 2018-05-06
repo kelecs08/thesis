@@ -2,6 +2,7 @@ package hu.elte.thesis.view.service;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -75,7 +76,13 @@ public class FileHandleService {
 	 * @throws IOException
 	 */
 	public void loadFromFile(File file) throws IOException {
-		BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+		FileReader fileReader = null;
+		try {
+			fileReader = new FileReader(file);
+		} catch(FileNotFoundException e) {
+			return;
+		}
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		String line = bufferedReader.readLine();
 		setGameDetails(line);
 		

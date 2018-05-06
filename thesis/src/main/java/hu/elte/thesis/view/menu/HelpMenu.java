@@ -42,11 +42,6 @@ public class HelpMenu extends JMenu {
 	 * 		this object
 	 */
 	public HelpMenu getHelpMenu() {
-		addGetHelpMenuItem();
-		return this;
-	}
-
-	private void addGetHelpMenuItem() {
 		JMenuItem showHelp = new JMenuItem("Instructions");
 		showHelp.addActionListener(new ActionListener() {
 			@Override
@@ -65,6 +60,7 @@ public class HelpMenu extends JMenu {
 		
 		add(showHelp);
 		add(credentials);
+		return this;
 	}
 
 	private void showHelpMessageDialog() {
@@ -94,13 +90,15 @@ public class HelpMenu extends JMenu {
 		JPanel panel = new JPanel();
 		BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
 		panel.setLayout(layout);
-		panel.setPreferredSize(new Dimension(250, 100));
+		panel.setPreferredSize(new Dimension(270, 140));
 		
 		JTextArea introductionTextArea = getTextArea(this.textProperties.getProperty("introduction"));
 		JTextArea creatorTextArea = getTextArea(this.textProperties.getProperty("creator"));
+		JTextArea creationDateTextArea = getTextArea(this.textProperties.getProperty("creationDate"));
 		
 		panel.add(introductionTextArea);
 		panel.add(creatorTextArea);
+		panel.add(creationDateTextArea);
 		
 		JOptionPane.showMessageDialog(mainController.getMainWindow(), panel, "About the coder", JOptionPane.OK_OPTION);
 	}
