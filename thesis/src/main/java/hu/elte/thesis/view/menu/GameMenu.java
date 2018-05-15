@@ -72,9 +72,10 @@ public class GameMenu extends JMenu {
 		newOnePlayerGameEasy.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(mainController.getGameType().equals(GameType.TWO_PLAYER))
+					mainController.setPlayerTwoName("Computer");				
 				mainController.setGameType(GameType.ONE_PLAYER);
 				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.EASY);
-				mainController.setPlayerTwoName("Computer");
 				mainController.startNewGame(true);
 			}
 		});
@@ -83,9 +84,10 @@ public class GameMenu extends JMenu {
 		newOnePlayerGameMedium.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(mainController.getGameType().equals(GameType.TWO_PLAYER))
+					mainController.setPlayerTwoName("Computer");	
 				mainController.setGameType(GameType.ONE_PLAYER);
 				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.MEDIUM);
-				mainController.setPlayerTwoName("Computer");
 				mainController.startNewGame(true);
 			}
 		});
@@ -94,9 +96,10 @@ public class GameMenu extends JMenu {
 		newOnePlayerGameHard.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(mainController.getGameType().equals(GameType.TWO_PLAYER))
+					mainController.setPlayerTwoName("Computer");	
 				mainController.setGameType(GameType.ONE_PLAYER);
 				mainController.setComputerPlayerDifficulty(ComputerPlayerDifficulty.HARD);
-				mainController.setPlayerTwoName("Computer");
 				mainController.startNewGame(true);
 			}
 		});
@@ -108,8 +111,9 @@ public class GameMenu extends JMenu {
 		newTwoPlayerGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(mainController.getGameType().equals(GameType.ONE_PLAYER))
+					mainController.setPlayerTwoName("Player2");	
 				mainController.setGameType(GameType.TWO_PLAYER);
-				mainController.setPlayerTwoName("Player2");
 				mainController.startNewGame(false);
 			}
 		});
@@ -124,7 +128,7 @@ public class GameMenu extends JMenu {
 	 */
 	private void addSaveGameMenuItem() {
 		ImageIcon saveIcon = imageResizingService.resizeImage(iconProperties.getProperty("save"), false);
-		JMenuItem saveGame = new JMenuItem("Save game", saveIcon);
+		JMenuItem saveGame = new JMenuItem("Save", saveIcon);
 		saveGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -150,7 +154,7 @@ public class GameMenu extends JMenu {
 
 	private void addLoadGameMenuItem() {
 		ImageIcon loadIcon = imageResizingService.resizeImage(iconProperties.getProperty("load"), false);
-		JMenuItem loadGame = new JMenuItem("Load game", loadIcon);
+		JMenuItem loadGame = new JMenuItem("Load", loadIcon);
 		loadGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

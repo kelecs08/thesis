@@ -100,7 +100,7 @@ public class HelpMenu extends JMenu {
 		panel.add(creatorTextArea);
 		panel.add(creationDateTextArea);
 		
-		JOptionPane.showMessageDialog(mainController.getMainWindow(), panel, "About the coder", JOptionPane.OK_OPTION);
+		JOptionPane.showMessageDialog(mainController.getMainWindow(), panel, "About the coder", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private JTextArea getTextArea(String text) {

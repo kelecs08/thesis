@@ -7,6 +7,11 @@ import org.junit.Test;
 import hu.elte.thesis.controller.service.PlayerService;
 import hu.elte.thesis.model.Player;
 
+/**
+ * Test class for {@link PlayerService}.
+ * 
+ * @author kelecs08
+ */
 public class PlayerServiceTest {
 
 	private PlayerService underTest = new PlayerService();

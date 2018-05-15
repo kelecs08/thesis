@@ -1,2 +1,0 @@
-https://stackoverflow.com/questions/18418912/change-the-look-and-feel-of-java-application-on-runtime-ide-netbeans
-https://stackoverflow.com/questions/8608902/the-correct-way-to-swap-a-component-in-java

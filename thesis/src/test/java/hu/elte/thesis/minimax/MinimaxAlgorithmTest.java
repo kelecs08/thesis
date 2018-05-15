@@ -1,5 +1,6 @@
 package hu.elte.thesis.minimax;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,7 +8,13 @@ import hu.elte.thesis.controller.algorithm.MinimaxAlgorithm;
 import hu.elte.thesis.controller.service.TableBoardService;
 import hu.elte.thesis.model.Player;
 import hu.elte.thesis.model.Position;
+import hu.elte.thesis.model.RootChild;
 
+/**
+ * Test class for {@link MinimaxAlgorithm}.
+ * 
+ * @author kelecs08
+ */
 public class MinimaxAlgorithmTest {
 	
 	private MinimaxAlgorithm underTest;
@@ -29,8 +36,21 @@ public class MinimaxAlgorithmTest {
 	}
 	
 	@Test
-	public void constructMinimaxTest() {
-		underTest.getStepUsingMinimax(tableBoardPositions, playerOne, playerTwo, 3, 3);
+	public void testgetStepUsingMinimax() {
+		// GIVEN
+		// WHEN
+		RootChild result = underTest.getStepUsingMinimax(tableBoardPositions, playerOne, playerTwo, 3, 3);
+		// THEN
+		Assert.assertNotNull(result);
+	}
+	
+	@Test
+	public void testGetBestStepAtEachRound() {
+		// GIVEN
+		// WHEN
+		RootChild result = underTest.getBestStepAtEachRound(tableBoardPositions, playerOne);
+		// THEN
+		Assert.assertNotNull(result);
 	}
 	
 }

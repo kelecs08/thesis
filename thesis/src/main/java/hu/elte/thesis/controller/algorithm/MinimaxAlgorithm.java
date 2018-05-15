@@ -98,11 +98,7 @@ public class MinimaxAlgorithm {
 		}
 		return bestScore;
 	}
-
-	/**
-	 * Returns one of the best positions to step.
-	 * @return
-	 */
+	
 	private RootChild getBestRootChild() {
 		List<RootChild> bestRootChildren = new ArrayList<>();
 

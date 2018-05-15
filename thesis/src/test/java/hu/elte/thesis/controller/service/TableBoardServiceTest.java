@@ -11,6 +11,11 @@ import org.junit.Test;
 import hu.elte.thesis.controller.service.TableBoardService;
 import hu.elte.thesis.model.Position;
 
+/**
+ * Test class for {@link TableBoardService}.
+ * 
+ * @author kelecs08
+ */
 public class TableBoardServiceTest {
 
 	private final TableBoardService underTest = new TableBoardService();
